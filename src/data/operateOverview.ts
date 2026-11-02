@@ -14,7 +14,7 @@ export type ControllingDevice = {
   id: string
   type: string
   program: string
-  status: 'Online'
+  status: 'Connected'
 }
 
 export type EquipmentStateValue = {
@@ -73,13 +73,13 @@ export const operateOverviewData = {
       id: 'EYC-303',
       type: 'Distech Controller',
       program: 'AHU Standard v2.3',
-      status: 'Online',
+      status: 'Connected',
     },
     {
       id: 'EYC-304',
       type: 'Distech I/O Module',
       program: '-',
-      status: 'Online',
+      status: 'Connected',
     },
   ] satisfies ControllingDevice[],
   equipmentState: [
