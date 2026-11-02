@@ -1,4 +1,5 @@
-import { AlertTriangle, ArrowRight, ChevronRight } from 'lucide-react'
+import { useState } from 'react'
+import { AlertTriangle, ArrowRight, CheckCircle2, ChevronRight, CircleX } from 'lucide-react'
 import {
   formatPointValue,
   getKeyPoint,
@@ -42,7 +43,9 @@ export function ActiveAlarmSummary({
         <div className="active-alarm-summary__columns" role="row">
           <span role="columnheader">Point</span>
           <span role="columnheader">Current Value</span>
-          <span role="columnheader">Alarm Condition</span>
+          <span role="columnheader">Alarm Message</span>
+          <span role="columnheader">Acknowledge</span>
+          <span role="columnheader">Clear</span>
           <span role="columnheader">Time in Alarm</span>
           <span role="columnheader">Action</span>
         </div>
@@ -62,30 +65,55 @@ function AlarmRow({
   onViewPoint: (pointId: string) => void
 }) {
   const point = getKeyPoint(alarm.id)
+  const [acknowledged, setAcknowledged] = useState(false)
+  const [clearRequested, setClearRequested] = useState(false)
 
   return (
-    <div className="active-alarm-summary__row" role="row">
-            <span className="active-alarm-summary__point" role="cell">
-              <AlertTriangle size={11} fill="currentColor" aria-hidden="true" />
-              {point?.pointName ?? alarm.id}
-            </span>
-            <span className="active-alarm-summary__value" role="cell">
-              {point ? formatPointValue(point.value, point.unit) : '—'}
-            </span>
-            <span className="active-alarm-summary__condition" role="cell">
-              <AlertTriangle size={11} fill="currentColor" aria-hidden="true" />
-              {alarm.condition}
-            </span>
-            <span className="active-alarm-summary__time" role="cell">
-              <span>{alarm.timestamp}</span>
-              <span className="active-alarm-summary__duration">({alarm.duration})</span>
-            </span>
-            <span className="active-alarm-summary__action-cell" role="cell">
-              <button type="button" onClick={() => onViewPoint(alarm.id)}>
-                View Point
-                <ChevronRight size={12} aria-hidden="true" />
-              </button>
-            </span>
+    <div className={`active-alarm-summary__row is-${point?.state.toLowerCase() ?? 'alarm'}`} role="row">
+      <span className="active-alarm-summary__point" role="cell">
+        <AlertTriangle size={11} fill="currentColor" aria-hidden="true" />
+        {point?.pointName ?? alarm.id}
+      </span>
+      <span className="active-alarm-summary__value" role="cell">
+        {point ? formatPointValue(point.value, point.unit) : '—'}
+      </span>
+      <span className="active-alarm-summary__condition" role="cell">
+        {alarm.condition}
+      </span>
+      <span className="active-alarm-summary__acknowledge" role="cell">
+        <button
+          className="alarm-status-action"
+          type="button"
+          aria-label={`Acknowledge ${point?.pointName ?? alarm.id}`}
+          aria-pressed={acknowledged}
+          title={acknowledged ? 'Acknowledged locally' : 'Acknowledge alarm'}
+          onClick={() => setAcknowledged((current) => !current)}
+        >
+          <CheckCircle2 size={13} aria-hidden="true" />
+        </button>
+      </span>
+      <span className="active-alarm-summary__clear" role="cell">
+        <button
+          className="alarm-status-action"
+          type="button"
+          aria-label={`Request clear ${point?.pointName ?? alarm.id}`}
+          aria-pressed={clearRequested}
+          title={clearRequested ? 'Clear requested locally' : 'Request alarm clear'}
+          onClick={() => setClearRequested((current) => !current)}
+        >
+          <CircleX size={13} aria-hidden="true" />
+        </button>
+      </span>
+      <span className="active-alarm-summary__time" role="cell">
+        <span>{alarm.timestamp}</span>
+        <span className="active-alarm-summary__duration">({alarm.duration})</span>
+      </span>
+      <span className="active-alarm-summary__action-cell" role="cell">
+        <button type="button" onClick={() => onViewPoint(alarm.id)}>
+          View Point
+          <ChevronRight size={12} aria-hidden="true" />
+        </button>
+      </span>
     </div>
   )
 }

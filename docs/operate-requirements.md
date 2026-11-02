@@ -131,3 +131,77 @@ These are not changes required for the initial prototype unless later confirmed:
 - Historical playback or a "time-machine" view of equipment state.
 - Configurable parent-equipment alarm warnings or automated diagnosis.
 - Integration with external asset-management systems.
+
+## Implemented Prototype Updates
+
+Approved version: November 2, 2026.
+
+The preceding sections preserve the original FigJam requirements, unresolved questions, and future ideas. This section records the subsequently approved prototype refinements and takes precedence when describing the current implemented UI. Items described here are local prototype behavior, not production services or permission policies.
+
+### Controlling Devices
+
+- Controller/device connection status uses `Connected`, replacing the earlier `Online` terminology. Both controller records use the shared status type and mock data so equipment views inherit the wording consistently.
+- Device names remain clickable through the existing device-navigation callback. The separate `View device details` link was removed to avoid duplicate navigation.
+- There is no implemented controller-detail screen: this callback still selects the Command Center stub. It must not be described as a completed device-detail workflow.
+
+### Alarm Summary and Equipment State
+
+- The Active Alarm Summary spans the full top content area above the navigation tabs. It retains the existing point names, readings, units, conditions, timing, `View Point`, and `View all alarms` actions.
+- The summary column is labelled `Alarm Message`. Compact Acknowledge and Clear controls provide local toggle/request feedback; Clear does not clear a live alarm, remove the mock record, or change the mock alarm counts.
+- Low status uses blue consistently across the alarm message, Key Points, point lists, Point Details, and relevant trend indicators. High remains red, Override remains orange, and the Normal status cue remains green.
+- Equipment State retains the existing control mode, occupancy, operating mode, fan status, and outdoor-air-damper values. `Customize` allows local selection of visible fields. Alarm and override counts are not duplicated as binary pills in this card.
+
+### Compact Key Points
+
+- Key Point cards display only point name, current value and unit, status, last-updated time, and the right-side navigation chevron.
+- SP/setpoint and alarm-condition text were removed from the cards. Trend-arrow icons and decorative status dots were also removed; the navigation chevron remains.
+- Padding, internal gaps, and fixed card heights were reduced. All cards remain consistently sized within each responsive layout, using four desktop columns and two phone columns with controlled overflow.
+- Normal, Low, High, and Override states and their status colors are preserved through shared card styles.
+- Every card still opens the exact selected Point Details. Setpoints and available alarm parameters remain in Point Details; they were not removed from the underlying mock data.
+- `View all points` continues to open the existing Points directory. The directory contains the eight named Key Points supplied by the reference; the roll-up still represents 14 total points. The UI does not fabricate the six unspecified point records.
+
+### Field Information and Upper Cards
+
+- Field Information was moved out of the lower resource stack and is rendered once beside Equipment Properties in the upper information-card area.
+- The desktop upper area uses a balanced two-column grid: Equipment Properties and Field Information share the first row; Controlling Devices and Equipment State occupy the next row. Cards fill the available main-column width with consistent gaps.
+- Field Information retains Location, Access, and Orientation, with a representative equipment image on the left and an `Edit` action at the top-right. Smaller layouts stack the image and information.
+- The local image uses `object-fit: cover` to crop without distortion. It is a public-domain representative air-handling-unit photograph, not a photograph of AHU-SA-01. Source and license are recorded in `src/assets/README.md`.
+- Edit opens a local form for the three field-information values. Save updates the mounted card; Cancel leaves the values unchanged. There is no backend persistence or permission model, and these edits can reset when the view is remounted.
+
+### Associated Documents
+
+- The equipment tabs are `Operate`, `Points`, `Trends`, and `Associated Documents`, with Associated Documents immediately to the right of Trends.
+- The existing Associated Documents component and all five local entries were moved into that tab. There is no duplicate documents panel in the Overview sidebar or farther down the page.
+- The tab preserves the written sequence, drawing, point list, maintenance manual, and equipment-photo archive entries, including document names, type/size metadata, selection highlighting, and button accessibility.
+- Document selection survives tab switches during the current app session. Selection does not download or fetch documents from external storage.
+- The mobile Documents shortcut opens the Associated Documents tab instead of linking to the removed Overview section.
+
+### Expanded Notes
+
+- Notes is the sole panel in the available right-side resource area. It fills that area's width and is sized against the upper information/roll-up region rather than stretching an empty panel alongside the entire chart stack.
+- The note-entry area is open by default and includes the note input, `Cancel`, and `Add note`. No preliminary Add Note button is required.
+- Cancel clears the draft without hiding the entry area. Adding a nonblank note creates a local record and clears the input while keeping it open.
+- Existing notes remain visible with author, date, and time. Adding a note automatically supplies the local mock author and current date/time; resolving and deleting notes remain available without real permission checks.
+- Added notes, resolved states, and deletions survive tab switches during the app session. They reset on reload; an unsent draft can reset when Notes is remounted.
+- Notes stacks on smaller screens and uses controlled history scrolling. Permission enforcement remains a future requirement, not an implemented restriction.
+
+### Overview Point Trend
+
+- AHU-SA-01 Overview includes a reusable Point Trend panel directly above Related Equipment, spanning the full main content column. The separate existing Trends tab remains available.
+- The default pre-built view is `Point Trend - Duct Static Pressure`, displaying Duct Static Pressure and Duct Static Pressure SP, using the existing pressure reading/setpoint data. The visible title uses an en dash between Point Trend and the point name.
+- The chart shows timestamped samples, an `in wc` axis for the pressure comparison, a primary area/line and a dashed setpoint line, series controls, and a top-right range selector and overflow menu.
+- Ranges are Last 4 Hours, Last 12 Hours, Last 24 Hours (default), and Last 7 Days. Hover shows a selected-time line, UTC date/time, and visible series values with units.
+- Series can be shown/hidden, focused, and scaled. A selected series has an explicit `View point` action that opens its exact existing Point Details. Chart lines do not navigate.
+- Alarm started, Override applied, and Setpoint changed markers expose local event descriptions/timestamps by hover, click, or keyboard selection without leaving the chart.
+- The second pre-built comparison contains Reheat, Supply Air Temperature, and Discharge Air Temperature. Pre-built Overview views are protected from series/name edits; duplicate a preset before customizing it.
+- Custom Overview trend views can be created, duplicated, renamed, removed, and have series added/removed from current equipment, related equipment, or the wider site. View configurations survive Point Details/tab navigation but reset on reload.
+- Configuration, timestamped samples/events, and chart rendering are separate. The seven-day samples are generated from local mock sequences and are not real historical measurements. No API, historical equipment playback, or time-machine behavior is implemented.
+- Desktop/tablet retain the complete chart. Narrow screens use contained horizontal chart scrolling instead of compressing it into an unreadable width.
+
+### Preserved Navigation and Scope
+
+- Alarm `View Point`, Key Point selection, and trend `View point` retain the selected point ID and reuse Point Details. Back uses the current equipment name and restores the originating tab/filter context.
+- Operational Roll-up keeps 11/14 Healthy, 2/14 In Alarm, and 1/14 In Override. Alarm and override actions open filtered Points views; View all alarms uses the alarm-filtered view.
+- Related Equipment navigation retains the selected-equipment header/tree synchronization and equipment Back action. Its diagram controls and Normal/Alarm/Override/Offline legend remain unchanged.
+- Desktop navigation, compact mobile navigation, and the Field Information, Notes, and Documents access paths remain available. No Graphics tab, parent-equipment diagnosis, asset-management integration, authentication, or backend persistence was added.
+- Known limitation: related-equipment navigation changes equipment context, but detailed overview/alarm mock content still comes from the available AHU-SA-01 dataset. Unimplemented primary-navigation/device destinations remain stubs, not new screens.

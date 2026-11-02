@@ -1,4 +1,4 @@
-import { ArrowRight, ChevronRight, TrendingDown, TrendingUp } from 'lucide-react'
+import { ArrowRight, ChevronRight } from 'lucide-react'
 import {
   formatPointValue,
   operateOverviewData,
@@ -17,10 +17,6 @@ function KeyPointCard({
   point: KeyPoint
   onSelectPoint: (pointId: string) => void
 }) {
-  const activeAlarm = operateOverviewData.activeAlarms.find(
-    (alarm) => alarm.id === point.id,
-  )
-  const TrendIcon = point.trend === 'down' ? TrendingDown : TrendingUp
   const stateClass = point.state.toLowerCase()
 
   return (
@@ -37,18 +33,11 @@ function KeyPointCard({
       <span className={`key-point-card__reading${point.unit === '%' ? ' is-percent' : ''}`}>
         <span>{point.value}</span>
         <small>{point.unit}</small>
-        <TrendIcon size={17} aria-hidden="true" />
       </span>
       <span className="key-point-card__metadata">
         <span className="key-point-card__state">
-          <span aria-hidden="true" />
           {point.state}
         </span>
-        {activeAlarm ? (
-          <span className="key-point-card__condition">{activeAlarm.condition}</span>
-        ) : point.setpoint ? (
-          <span className="key-point-card__setpoint">SP: {point.setpoint}</span>
-        ) : null}
         <span className="key-point-card__updated">{point.updated}</span>
       </span>
     </button>

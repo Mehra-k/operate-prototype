@@ -1,26 +1,30 @@
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type Dispatch, type FormEvent, type SetStateAction } from 'react'
 import {
   Archive,
-  Camera,
   Check,
   Compass,
   FileSpreadsheet,
   FileText,
   MapPin,
-  Plus,
+  Pencil,
   Trash2,
+  X,
 } from 'lucide-react'
 import {
   equipmentDocuments,
   fieldInformation,
-  initialEquipmentNotes,
   type EquipmentDocument,
   type EquipmentNote,
 } from '../data/equipmentResources.ts'
 
-function NotesPanel() {
-  const [notes, setNotes] = useState(initialEquipmentNotes)
-  const [isAddingNote, setIsAddingNote] = useState(false)
+const equipmentImage = new URL('../assets/air-handling-unit.jpg', import.meta.url).href
+
+export type EquipmentNotesProps = {
+  notes: EquipmentNote[]
+  onNotesChange: Dispatch<SetStateAction<EquipmentNote[]>>
+}
+
+function NotesPanel({ notes, onNotesChange: setNotes }: EquipmentNotesProps) {
   const [draft, setDraft] = useState('')
 
   function addNote(event: FormEvent<HTMLFormElement>) {
@@ -52,7 +56,6 @@ function NotesPanel() {
       ...current,
     ])
     setDraft('')
-    setIsAddingNote(false)
   }
 
   function markResolved(noteId: string) {
@@ -69,18 +72,8 @@ function NotesPanel() {
     <section className="equipment-resource-panel notes-panel" aria-labelledby="notes-heading">
       <header className="equipment-resource-panel__header">
         <h2 id="notes-heading">Notes</h2>
-        <button
-          className="equipment-resource-panel__header-action"
-          type="button"
-          aria-expanded={isAddingNote}
-          onClick={() => setIsAddingNote((current) => !current)}
-        >
-          <Plus size={12} aria-hidden="true" />
-          Add Note
-        </button>
       </header>
-      {isAddingNote && (
-        <form className="notes-panel__form" onSubmit={addNote}>
+      <form className="notes-panel__form" onSubmit={addNote}>
           <label htmlFor="equipment-note-draft">Note</label>
           <textarea
             id="equipment-note-draft"
@@ -92,14 +85,12 @@ function NotesPanel() {
           <div className="notes-panel__form-actions">
             <button type="button" onClick={() => {
               setDraft('')
-              setIsAddingNote(false)
             }}>
               Cancel
             </button>
             <button type="submit" disabled={!draft.trim()}>Add note</button>
           </div>
-        </form>
-      )}
+      </form>
       <div className="notes-panel__list">
         {notes.map((note) => (
           <NoteItem
@@ -170,9 +161,13 @@ function DocumentIcon({ type }: { type: EquipmentDocument['type'] }) {
   return <FileText size={16} aria-hidden="true" />
 }
 
-function DocumentsPanel() {
-  const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null)
-
+export function DocumentsPanel({
+  selectedDocumentId,
+  onSelectDocument,
+}: {
+  selectedDocumentId: string | null
+  onSelectDocument: (documentId: string) => void
+}) {
   return (
     <section className="equipment-resource-panel documents-panel" aria-labelledby="documents-heading">
       <header className="equipment-resource-panel__header">
@@ -186,7 +181,7 @@ function DocumentsPanel() {
             type="button"
             key={document.id}
             aria-pressed={selectedDocumentId === document.id}
-            onClick={() => setSelectedDocumentId(document.id)}
+            onClick={() => onSelectDocument(document.id)}
           >
             <span className={`documents-panel__icon is-${document.type.toLowerCase()}`}>
               <DocumentIcon type={document.type} />
@@ -202,43 +197,79 @@ function DocumentsPanel() {
   )
 }
 
-function FieldInformationPanel() {
+export function FieldInformationPanel() {
+  const [information, setInformation] = useState(fieldInformation)
+  const [draft, setDraft] = useState(fieldInformation)
+  const editDialog = useRef<HTMLDialogElement>(null)
+
+  function saveInformation(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setInformation({ location: draft.location.trim(), access: draft.access.trim(), orientation: draft.orientation.trim() })
+    editDialog.current?.close()
+  }
+
   return (
     <section className="equipment-resource-panel field-information-panel" aria-labelledby="field-information-heading">
       <header className="equipment-resource-panel__header">
         <h2 id="field-information-heading">Field Information</h2>
+        <button className="equipment-resource-panel__header-action" type="button" onClick={() => {
+          setDraft(information)
+          editDialog.current?.showModal()
+        }}>
+          <Pencil size={12} aria-hidden="true" />
+          Edit
+        </button>
       </header>
-      <div className="field-information-panel__photo" role="img" aria-label="Equipment photo placeholder">
-        <Camera size={19} aria-hidden="true" />
-        <span>Equipment photo</span>
-      </div>
+      <div className="field-information-panel__body">
+      <img
+        className="field-information-panel__photo"
+        src={equipmentImage}
+        alt="Representative air-handling unit"
+        title="Representative equipment photo by P199, Wikimedia Commons, public domain"
+        width={320}
+        height={240}
+      />
       <dl className="field-information-panel__list">
         <div>
           <MapPin size={13} aria-hidden="true" />
           <dt>Location</dt>
-          <dd>{fieldInformation.location}</dd>
+          <dd>{information.location}</dd>
         </div>
         <div>
           <MapPin size={13} aria-hidden="true" />
           <dt>Access</dt>
-          <dd>{fieldInformation.access}</dd>
+          <dd>{information.access}</dd>
         </div>
         <div>
           <Compass size={13} aria-hidden="true" />
           <dt>Orientation</dt>
-          <dd>{fieldInformation.orientation}</dd>
+          <dd>{information.orientation}</dd>
         </div>
       </dl>
+      </div>
+      <dialog className="equipment-state-customize field-information-panel__edit" ref={editDialog} aria-labelledby="edit-field-information-heading">
+        <header>
+          <h3 id="edit-field-information-heading">Edit Field Information</h3>
+          <button type="button" title="Close" aria-label="Close field information editor" onClick={() => editDialog.current?.close()}><X size={16} aria-hidden="true" /></button>
+        </header>
+        <form onSubmit={saveInformation}>
+          <label>Location<input value={draft.location} onChange={(event) => setDraft((current) => ({ ...current, location: event.target.value }))} required /></label>
+          <label>Access<input value={draft.access} onChange={(event) => setDraft((current) => ({ ...current, access: event.target.value }))} required /></label>
+          <label>Orientation<textarea value={draft.orientation} onChange={(event) => setDraft((current) => ({ ...current, orientation: event.target.value }))} required /></label>
+          <footer>
+            <button type="button" className="equipment-state-card__customize" onClick={() => editDialog.current?.close()}>Cancel</button>
+            <button type="submit" className="equipment-state-card__customize" disabled={!draft.location.trim() || !draft.access.trim() || !draft.orientation.trim()}>Save</button>
+          </footer>
+        </form>
+      </dialog>
     </section>
   )
 }
 
-export function EquipmentResources() {
+export function EquipmentResources({ notes, onNotesChange }: EquipmentNotesProps) {
   return (
     <div className="equipment-resources">
-      <DocumentsPanel />
-      <NotesPanel />
-      <FieldInformationPanel />
+      <NotesPanel notes={notes} onNotesChange={onNotesChange} />
     </div>
   )
 }

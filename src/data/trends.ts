@@ -104,7 +104,7 @@ export const trendSeriesCatalog: TrendSeriesOption[] = [
     source: 'Current equipment',
     unit: 'in wc',
     axisId: 'left',
-    color: '#c83b3b',
+    color: '#1676c5',
     values: [1.7, 1.6, 1.2, 1.3, 1.4, 1.5, 1.6, 1.5, 1.4, 1.3, 1.2, 1.3, 1.4, 1.2],
   },
   {
@@ -239,7 +239,7 @@ export const trendEvents: TrendEvent[] = [
     timestamp: 'Oct 28, 2026, 10:14 AM',
     pointName: 'Duct Static Pressure',
     summary: 'Low alarm started below the 1.5 in wc threshold.',
-    color: '#c62828',
+    color: '#1676c5',
   },
   {
     id: 'vav-02-override',

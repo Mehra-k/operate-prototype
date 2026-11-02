@@ -1,6 +1,7 @@
 import { lazy, Suspense, useState } from 'react'
 import { EquipmentHierarchy } from './components/EquipmentHierarchy.tsx'
-import { EquipmentPage } from './components/EquipmentPage.tsx'
+import { EquipmentPage, type EquipmentTab } from './components/EquipmentPage.tsx'
+import { DocumentsPanel } from './components/EquipmentResources.tsx'
 import { ActiveAlarmSummary } from './components/ActiveAlarmSummary.tsx'
 import { PointDetails } from './components/PointDetails.tsx'
 import { PointDirectory } from './components/PointDirectory.tsx'
@@ -16,6 +17,8 @@ import {
 } from './data/equipment.ts'
 import { operateOverviewData, type PointFilter } from './data/operateOverview.ts'
 import { trendPointDetails } from './data/trends.ts'
+import { overviewTrendPresets, pressureSetpointDetails, type OverviewTrendState } from './data/overviewTrends.ts'
+import { initialEquipmentNotes } from './data/equipmentResources.ts'
 
 const TrendsExperience = lazy(() => import('./components/TrendsExperience.tsx'))
 
@@ -23,7 +26,7 @@ export default function App() {
   type EquipmentContext = {
     selectedNodeId: string
     activeNavigation: string
-    activeTab: 'Operate' | 'Points' | 'Trends'
+    activeTab: EquipmentTab
     pointsFilter: PointFilter | null
     selectedPointId: string | null
   }
@@ -34,11 +37,16 @@ export default function App() {
 
   const [selectedNodeId, setSelectedNodeId] = useState('ahu-sa-01')
   const [activeNavigation, setActiveNavigation] = useState('Equipment')
-  const [activeTab, setActiveTab] = useState<'Operate' | 'Points' | 'Trends'>('Operate')
+  const [activeTab, setActiveTab] = useState<EquipmentTab>('Operate')
+  const [notes, setNotes] = useState(initialEquipmentNotes)
+  const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null)
   const [pointsFilter, setPointsFilter] = useState<PointFilter | null>(null)
   const [selectedPointId, setSelectedPointId] = useState<string | null>(null)
   const [equipmentHistory, setEquipmentHistory] = useState<EquipmentContext[]>([])
   const [pointReturnContext, setPointReturnContext] = useState<PointReturnContext | null>(null)
+  const [pointTrendState, setPointTrendState] = useState<OverviewTrendState>(
+    () => ({ views: overviewTrendPresets, activeViewId: overviewTrendPresets[0].id }),
+  )
   const selectedPath = findEquipmentPath(equipmentHierarchy, selectedNodeId) ?? []
   const selectedNode = selectedPath.at(-1)
 
@@ -126,6 +134,7 @@ export default function App() {
   const selectedPoint = [
     ...operateOverviewData.keyPoints,
     ...trendPointDetails,
+    pressureSetpointDetails,
   ].find((point) => point.id === selectedPointId)
   const previousEquipmentId = equipmentHistory.at(-1)?.selectedNodeId
   const previousEquipmentName = previousEquipmentId
@@ -168,6 +177,11 @@ export default function App() {
               previousEquipmentName={previousEquipmentName}
               onSelectRelatedEquipment={navigateToEquipment}
               onBackToPreviousEquipment={returnToPreviousEquipment}
+              pointTrendState={pointTrendState}
+              onPointTrendStateChange={setPointTrendState}
+              notes={notes}
+              onNotesChange={setNotes}
+              onViewDocuments={() => setActiveTab('Associated Documents')}
             />
           )}
           {activeTab === 'Points' && selectedPoint && (
@@ -187,6 +201,9 @@ export default function App() {
             <Suspense fallback={null}>
               <TrendsExperience onViewPoint={openPointDetails} />
             </Suspense>
+          )}
+          {activeTab === 'Associated Documents' && (
+            <DocumentsPanel selectedDocumentId={selectedDocumentId} onSelectDocument={setSelectedDocumentId} />
           )}
         </EquipmentPage>
       </div>

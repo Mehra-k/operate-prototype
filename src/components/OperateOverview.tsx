@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import {
   ControllingDevicesCard,
   EquipmentPropertiesCard,
@@ -7,18 +8,24 @@ import { OperationalRollup } from './OperationalRollup.tsx'
 import { KeyPointsSection } from './KeyPointsSection.tsx'
 import type { PointFilter } from '../data/operateOverview.ts'
 import { RelatedEquipment } from './RelatedEquipment.tsx'
-import { EquipmentResources } from './EquipmentResources.tsx'
+import { EquipmentResources, FieldInformationPanel, type EquipmentNotesProps } from './EquipmentResources.tsx'
+import type { OverviewTrendState } from '../data/overviewTrends.ts'
 
-type OperateOverviewProps = {
+const PointTrendPanel = lazy(() => import('./PointTrendPanel.tsx'))
+
+type OperateOverviewProps = EquipmentNotesProps & {
   onViewDevice: (deviceId: string) => void
   onFilterPoints: (filter: PointFilter) => void
   onViewAllPoints: () => void
   onViewPointDetails: (pointId: string) => void
+  onViewDocuments: () => void
   currentEquipmentId: string
   relatedEquipmentVisible: boolean
   previousEquipmentName?: string
   onSelectRelatedEquipment: (equipmentId: string) => void
   onBackToPreviousEquipment: () => void
+  pointTrendState: OverviewTrendState
+  onPointTrendStateChange: (state: OverviewTrendState) => void
 }
 
 export function OperateOverview({
@@ -31,6 +38,11 @@ export function OperateOverview({
   previousEquipmentName,
   onSelectRelatedEquipment,
   onBackToPreviousEquipment,
+  pointTrendState,
+  onPointTrendStateChange,
+  notes,
+  onNotesChange,
+  onViewDocuments,
 }: OperateOverviewProps) {
   return (
     <div className="operate-overview">
@@ -38,11 +50,12 @@ export function OperateOverview({
       <nav className="operate-overview__mobile-shortcuts" aria-label="Troubleshooting shortcuts">
         <a href="#notes-heading">Notes</a>
         <a href="#field-information-heading">Field information</a>
-        <a href="#documents-heading">Documents</a>
+        <button type="button" onClick={onViewDocuments}>Documents</button>
         {relatedEquipmentVisible && <a href="#related-equipment-heading">Related equipment</a>}
       </nav>
       <div className="operate-overview__cards">
         <EquipmentPropertiesCard />
+        <FieldInformationPanel />
         <ControllingDevicesCard onViewDevice={onViewDevice} />
         <EquipmentStateCard />
       </div>
@@ -51,6 +64,11 @@ export function OperateOverview({
         onViewAllPoints={onViewAllPoints}
         onSelectPoint={onViewPointDetails}
       />
+      {currentEquipmentId === 'ahu-sa-01' && (
+        <Suspense fallback={<div className="overview-point-trend__loading" aria-label="Loading Point Trend" />}>
+          <PointTrendPanel state={pointTrendState} onStateChange={onPointTrendStateChange} onViewPoint={onViewPointDetails} />
+        </Suspense>
+      )}
       {relatedEquipmentVisible && (
         <RelatedEquipment
           currentEquipmentId={currentEquipmentId}
@@ -59,7 +77,7 @@ export function OperateOverview({
           onBack={onBackToPreviousEquipment}
         />
       )}
-      <EquipmentResources />
+      <EquipmentResources notes={notes} onNotesChange={onNotesChange} />
     </div>
   )
 }

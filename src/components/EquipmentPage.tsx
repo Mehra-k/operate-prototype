@@ -1,11 +1,13 @@
 import type { ReactNode } from 'react'
 import { ChevronRight } from 'lucide-react'
 
+export type EquipmentTab = 'Operate' | 'Points' | 'Trends' | 'Associated Documents'
+
 type EquipmentPageProps = {
   equipmentName: string
   equipmentPath: string[]
-  activeTab: 'Operate' | 'Points' | 'Trends'
-  onTabChange: (tab: 'Operate' | 'Points' | 'Trends') => void
+  activeTab: EquipmentTab
+  onTabChange: (tab: EquipmentTab) => void
   headerContent?: ReactNode
   children?: ReactNode
 }
@@ -39,10 +41,10 @@ export function EquipmentPage({
         </p>
         {headerContent}
         <div className="equipment-page__tabs" role="tablist" aria-label="Equipment views">
-          {(['Operate', 'Points', 'Trends'] as const).map((tab) => (
+          {(['Operate', 'Points', 'Trends', 'Associated Documents'] as const).map((tab) => (
             <button
               className={`equipment-page__tab${activeTab === tab ? ' is-active' : ''}`}
-              id={`tab-${tab.toLowerCase()}`}
+              id={`tab-${tab.toLowerCase().replaceAll(' ', '-')}`}
               key={tab}
               type="button"
               role="tab"
@@ -59,7 +61,7 @@ export function EquipmentPage({
         className="equipment-page__content"
         id="equipment-page-content"
         role="tabpanel"
-        aria-labelledby={`tab-${activeTab.toLowerCase()}`}
+        aria-labelledby={`tab-${activeTab.toLowerCase().replaceAll(' ', '-')}`}
         aria-label={`${activeTab} content`}
       >
         {children}

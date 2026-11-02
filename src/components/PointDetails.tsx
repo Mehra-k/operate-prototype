@@ -17,7 +17,7 @@ export function PointDetails({ point, equipmentName, onBack }: PointDetailsProps
   )
 
   return (
-    <div className="point-details">
+    <div className={`point-details is-${point.state.toLowerCase()}`}>
       <button className="point-details__back" type="button" onClick={onBack}>
         <ArrowLeft size={14} aria-hidden="true" />
         Back to {equipmentName}
@@ -37,7 +37,7 @@ export function PointDetails({ point, equipmentName, onBack }: PointDetailsProps
         </div>
         <div>
           <span>{alarm ? 'Alarm State' : 'Point State'}</span>
-          <strong>{point.state}</strong>
+          <strong className="point-details__status-text">{point.state}</strong>
         </div>
         {alarm && (
           <div>
@@ -63,7 +63,7 @@ export function PointDetails({ point, equipmentName, onBack }: PointDetailsProps
             {alarm && (
               <div>
                 <dt>Alarm Condition</dt>
-                <dd>{alarm.condition}</dd>
+                <dd className="point-details__alarm-message">{alarm.condition}</dd>
               </div>
             )}
           </dl>
@@ -73,7 +73,7 @@ export function PointDetails({ point, equipmentName, onBack }: PointDetailsProps
           {alarm && (
             <div className="point-details__history-row">
               <span>{alarm.timestamp}</span>
-              <span>{alarm.condition}</span>
+              <span className="point-details__alarm-message">{alarm.condition}</span>
               <span>{alarm.duration}</span>
             </div>
           )}

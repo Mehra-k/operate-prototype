@@ -1,10 +1,11 @@
+import { useRef, useState, type ReactNode } from 'react'
 import {
   Building2,
-  ChevronRight,
   Fan,
   Settings2,
   Snowflake,
   Wind,
+  X,
   type LucideIcon,
 } from 'lucide-react'
 import {
@@ -16,14 +17,16 @@ function OverviewCard({
   title,
   children,
   className = '',
+  action,
 }: {
   title: string
-  children: React.ReactNode
+  children: ReactNode
   className?: string
+  action?: ReactNode
 }) {
   return (
     <section className={`overview-card ${className}`}>
-      <h2 className="overview-card__title">{title}</h2>
+      <h2 className="overview-card__title">{title}{action}</h2>
       {children}
     </section>
   )
@@ -76,14 +79,6 @@ export function ControllingDevicesCard({
           </article>
         ))}
       </div>
-      <button
-        className="controlling-devices-card__details-link"
-        type="button"
-        onClick={() => onViewDevice(operateOverviewData.controllingDevices[0].id)}
-      >
-        View device details
-        <ChevronRight size={12} aria-hidden="true" />
-      </button>
     </OverviewCard>
   )
 }
@@ -97,10 +92,28 @@ const stateIcons: Record<EquipmentStateValue['icon'], LucideIcon> = {
 }
 
 export function EquipmentStateCard() {
+  const customizeDialog = useRef<HTMLDialogElement>(null)
+  const [visibleFields, setVisibleFields] = useState<string[]>(
+    () => operateOverviewData.equipmentState.map((item) => item.label),
+  )
+
   return (
-    <OverviewCard title="Equipment State" className="equipment-state-card">
+    <OverviewCard
+      title="Equipment State"
+      className="equipment-state-card"
+      action={(
+        <button
+          className="equipment-state-card__customize"
+          type="button"
+          onClick={() => customizeDialog.current?.showModal()}
+        >
+          <Settings2 size={11} aria-hidden="true" />
+          Customize
+        </button>
+      )}
+    >
       <dl className="equipment-state-card__list">
-        {operateOverviewData.equipmentState.map((item) => {
+        {operateOverviewData.equipmentState.filter((item) => visibleFields.includes(item.label)).map((item) => {
           const Icon = stateIcons[item.icon]
           return (
             <div className="equipment-state-card__row" key={item.label}>
@@ -111,6 +124,27 @@ export function EquipmentStateCard() {
           )
         })}
       </dl>
+      <dialog className="equipment-state-customize" ref={customizeDialog} aria-labelledby="customize-state-heading">
+        <header>
+          <h3 id="customize-state-heading">Customize Equipment State</h3>
+          <button type="button" aria-label="Close customization" title="Close" onClick={() => customizeDialog.current?.close()}>
+            <X size={16} aria-hidden="true" />
+          </button>
+        </header>
+        {operateOverviewData.equipmentState.map((item) => (
+          <label key={item.label}>
+            <input
+              type="checkbox"
+              checked={visibleFields.includes(item.label)}
+              onChange={(event) => setVisibleFields((current) => event.target.checked
+                ? [...current, item.label]
+                : current.filter((field) => field !== item.label))}
+            />
+            {item.label}
+          </label>
+        ))}
+        <button className="equipment-state-card__customize" type="button" onClick={() => customizeDialog.current?.close()}>Done</button>
+      </dialog>
     </OverviewCard>
   )
 }

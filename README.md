@@ -36,10 +36,13 @@ npm run preview
 - `src/App.tsx`: prototype view state and navigation.
 - `src/components/`: reusable components and prototype views.
 - `src/data/`: local equipment, points, trends, notes, and document mock data.
+- `src/assets/`: bundled representative equipment image and its source/license notes.
 - `src/styles.css`: desktop and responsive styles.
 - `docs/operate-requirements.md`: FigJam-derived requirements, future concepts, and unresolved decisions.
 
 See [Operate requirements](docs/operate-requirements.md) for the design source and scope. Some destinations remain prototype stubs, document selection does not fetch files, and related equipment reuses the available AHU mock content. Session changes are not persisted to a backend.
+
+The current equipment tabs are Operate, Points, Trends, and Associated Documents. Overview includes the upper equipment/field-information cards, compact Key Points, an inline Point Trend, Related Equipment, and an always-open Notes composer. See [Implemented Prototype Updates](docs/operate-requirements.md#implemented-prototype-updates) for the approved November 2, 2026 changes and local-only behavior.
 
 ## Repository hygiene
 

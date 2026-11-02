@@ -51,7 +51,7 @@ export function FilteredPoints({ filter }: FilteredPointsProps) {
           <span role="columnheader">Status</span>
         </div>
         {points.map((point) => (
-          <div className="filtered-points__row" role="row" key={point.id}>
+          <div className={`filtered-points__row is-${getKeyPoint(point.id)?.state.toLowerCase() ?? 'normal'}`} role="row" key={point.id}>
             <span className="filtered-points__name" role="cell">
               {!isAlarmFilter && <AlertTriangle size={12} aria-hidden="true" />}
               {point.pointName}
