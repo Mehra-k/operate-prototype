@@ -1,4 +1,5 @@
 import type { KeyPoint } from './operateOverview.ts'
+import { efStatusColors } from './statusColors.ts'
 
 export type TrendSource = 'Current equipment' | 'Related equipment' | 'Wider site'
 
@@ -239,7 +240,7 @@ export const trendEvents: TrendEvent[] = [
     timestamp: 'Oct 28, 2026, 10:14 AM',
     pointName: 'Duct Static Pressure',
     summary: 'Low alarm started below the 1.5 in wc threshold.',
-    color: '#1676c5',
+    color: efStatusColors.alarm.primary,
   },
   {
     id: 'vav-02-override',
@@ -248,7 +249,7 @@ export const trendEvents: TrendEvent[] = [
     timestamp: 'Oct 28, 2026, 2:00 PM',
     pointName: 'VAV-02',
     summary: 'Override applied to VAV-02.',
-    color: '#c45516',
+    color: efStatusColors.override.primary,
   },
   {
     id: 'airflow-setpoint-change',

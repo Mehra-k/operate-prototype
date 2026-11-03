@@ -1,5 +1,6 @@
 import { getKeyPoint, type KeyPoint } from './operateOverview.ts'
 import { trendEvents, trendSeriesCatalog, type TrendSource } from './trends.ts'
+import { efStatusColors } from './statusColors.ts'
 
 export type OverviewTrendSeries = {
   id: string
@@ -122,7 +123,7 @@ export const overviewTrendEvents: OverviewTrendEvent[] = [
     kind: 'Override applied',
     timestamp: Date.parse('2026-10-28T14:00:00Z'),
     description: 'Local mock override event recorded during equipment troubleshooting.',
-    color: '#c45516',
+    color: efStatusColors.override.primary,
   },
   {
     id: 'pressure-sp-change',

@@ -205,3 +205,28 @@ The preceding sections preserve the original FigJam requirements, unresolved que
 - Related Equipment navigation retains the selected-equipment header/tree synchronization and equipment Back action. Its diagram controls and Normal/Alarm/Override/Offline legend remain unchanged.
 - Desktop navigation, compact mobile navigation, and the Field Information, Notes, and Documents access paths remain available. No Graphics tab, parent-equipment diagnosis, asset-management integration, authentication, or backend persistence was added.
 - Known limitation: related-equipment navigation changes equipment context, but detailed overview/alarm mock content still comes from the available AHU-SA-01 dataset. Unimplemented primary-navigation/device destinations remain stubs, not new screens.
+
+## Established EF Status Colours
+
+Approved palette update: November 3, 2026. The existing EF mappings below are the source of truth for status colour in the prototype. This update supersedes earlier colour descriptions, including the November 2 blue Low-alarm and orange Override treatments, without changing status meanings, readings, counts, layout, or interactions.
+
+| EF status | Primary | Secondary |
+| --- | --- | --- |
+| In Alarm | `#BE2434` | `#FB6265` |
+| Down / Communication Failure | `#C0570D` | `#EAB448` |
+| Fault | `#C0570D` | `#EAB448` |
+| Out of Service | `#BE2434` | `#FB6265` |
+| Overridden | `#9781E2` | `#9781E2` |
+| Unacknowledged Alarm | `#BE2434` | `#FB6265` |
+| Disabled | `#505050` | `#CCCCCC` |
+| Stale | `#FDB813` | `#FDB813` |
+| OK / Default | `#358600` | `#A7D987` |
+
+- `src/data/statusColors.ts` defines the palette once. Application startup exposes `--ef-status-<status>-primary` and `--ef-status-<status>-secondary` CSS variables before React renders. Status-specific chart events import the same mapping rather than duplicating colour values.
+- Primary colours apply to status text, dots, icons, progress fills, and status-coloured borders. Existing supporting backgrounds use pale tints derived from the appropriate secondary colour; no additional status highlights or layout elements are introduced.
+- Low and High describe threshold direction on existing alarmed points and therefore use In Alarm. Offline in the existing relationship legend uses Down / Communication Failure. Override/In Override uses Overridden. Normal, Healthy, Connected, and resolved-note indicators use OK / Default.
+- The palette applies across Active Alarms, Operational Roll-up, Key Points, the equipment-tree alarm indicator, Related Equipment nodes/legend, Point Details, filtered tables/lists, and alarm/override event markers.
+- Controller connection wording remains `Connected`. Existing point/status labels, selected states, interactions, and data are unchanged.
+- Ordinary chart-series identity colours, setpoint-change event colours, links, focus/selection styling, document-type icons, and neutral UI controls are not status meanings and retain their existing colours. A disabled form button is not the equipment Disabled status.
+- All nine EF mappings are defined, including Fault, Out of Service, Disabled, and Stale even where the current mock dataset has no corresponding visible record. No new mock states or functionality are added to demonstrate unused mappings.
+- Desktop and mobile reuse the same palette and status selectors; the update does not change sizes, gaps, layout, or navigation.
