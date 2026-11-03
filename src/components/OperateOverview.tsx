@@ -53,7 +53,19 @@ export function OperateOverview({
   return (
     <div className={containerClass}>
       <div className="operate-overview">
-        <h2 className="operate-overview__section-heading">Overview</h2>
+        <div className="operate-overview__header">
+          <h2 className="operate-overview__section-heading">Overview</h2>
+          {!notesOpen && onToggleNotes && (
+            <button
+              className="operate-overview__notes-reopen-btn"
+              onClick={() => onToggleNotes(true)}
+              type="button"
+              aria-label="Open Notes panel"
+            >
+              Notes
+            </button>
+          )}
+        </div>
         <nav className="operate-overview__mobile-shortcuts" aria-label="Troubleshooting shortcuts">
           <a href="#notes-heading">Notes</a>
           <a href="#field-information-heading">Field information</a>

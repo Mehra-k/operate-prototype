@@ -161,8 +161,6 @@ export default function App() {
           equipmentPath={selectedPath.map((node) => node.name)}
           activeTab={activeTab}
           onTabChange={setActiveTab}
-          notesOpen={notesOpen}
-          onToggleNotes={setNotesOpen}
           headerContent={activeTab === 'Operate' ? (
             <ActiveAlarmSummary
               onViewPoint={openPointDetails}

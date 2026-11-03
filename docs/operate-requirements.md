@@ -416,14 +416,18 @@ The following features are **out of scope** for the current prototype and should
    - "Program/Sequence" for program/sequence name field
 8. Attempted Related Equipment connector line fix (reverted due to layout break)
 9. Added collapsible Notes panel:
-   - Notes column is visible by default on desktop
+   - Notes column is visible by default on desktop as the right-side column of the Overview area
    - Users can collapse Notes using a ChevronLeft icon in the Notes header
    - When collapsed, the main Operate content expands to full available width
    - No empty Notes column remains when collapsed
    - Existing card hierarchy and proportions are preserved during expansion
    - Notes state and content are preserved during collapse/reopen
-   - Users can reopen Notes using a "Notes" button positioned in the top-right of the equipment page header (near the alarm summary and tabs)
-   - The Open Notes button remains accessible at the top of the page without requiring scroll
+   - When Notes is collapsed, a "Notes" reopen button appears on the same row as the "Overview" heading
+   - The Notes reopen button is aligned to the far right of the Overview heading row
+   - The Notes reopen button does NOT appear beside Active Alarms or at the bottom of the page
+   - The Notes reopen button remains accessible without requiring scroll
+   - Clicking the Notes button restores the Notes right-side column
+   - The Overview-level Notes button disappears when Notes is open
    - Original layout is restored when Notes is reopened
 10. Finalized documentation and verified all features
 
