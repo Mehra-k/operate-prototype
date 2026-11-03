@@ -2,6 +2,7 @@ import { useRef, useState, type Dispatch, type FormEvent, type ReactNode, type S
 import {
   Archive,
   Check,
+  ChevronLeft,
   Download,
   FileSpreadsheet,
   FileText,
@@ -20,9 +21,11 @@ const equipmentImage = new URL('../assets/air-handling-unit.jpg', import.meta.ur
 export type EquipmentNotesProps = {
   notes: EquipmentNote[]
   onNotesChange: Dispatch<SetStateAction<EquipmentNote[]>>
+  notesOpen?: boolean
+  onToggleNotes?: (open: boolean) => void
 }
 
-function NotesPanel({ notes, onNotesChange: setNotes }: EquipmentNotesProps) {
+function NotesPanel({ notes, onNotesChange: setNotes, onToggleNotes }: EquipmentNotesProps) {
   const [draft, setDraft] = useState('')
 
   function addNote(event: FormEvent<HTMLFormElement>) {
@@ -70,6 +73,17 @@ function NotesPanel({ notes, onNotesChange: setNotes }: EquipmentNotesProps) {
     <section className="equipment-resource-panel notes-panel" aria-labelledby="notes-heading">
       <header className="equipment-resource-panel__header">
         <h2 id="notes-heading">Notes</h2>
+        {onToggleNotes && (
+          <button
+            className="notes-panel__collapse-btn"
+            onClick={() => onToggleNotes(false)}
+            aria-label="Collapse Notes panel"
+            type="button"
+            title="Collapse Notes"
+          >
+            <ChevronLeft size={20} aria-hidden="true" />
+          </button>
+        )}
       </header>
       <form className="notes-panel__form" onSubmit={addNote}>
           <label htmlFor="equipment-note-draft">Note</label>
@@ -305,10 +319,10 @@ function FileIcon({ type, size }: { type: EquipmentDocument['type']; size: numbe
   return <FileText size={size} aria-hidden="true" />
 }
 
-export function EquipmentResources({ notes, onNotesChange }: EquipmentNotesProps) {
+export function EquipmentResources({ notes, onNotesChange, onToggleNotes }: EquipmentNotesProps) {
   return (
     <div className="equipment-resources">
-      <NotesPanel notes={notes} onNotesChange={onNotesChange} />
+      <NotesPanel notes={notes} onNotesChange={onNotesChange} onToggleNotes={onToggleNotes} />
     </div>
   )
 }

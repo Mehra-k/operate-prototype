@@ -47,6 +47,7 @@ export default function App() {
   const [pointTrendState, setPointTrendState] = useState<OverviewTrendState>(
     () => ({ views: overviewTrendPresets, activeViewId: overviewTrendPresets[0].id }),
   )
+  const [notesOpen, setNotesOpen] = useState(true)
   const selectedPath = findEquipmentPath(equipmentHierarchy, selectedNodeId) ?? []
   const selectedNode = selectedPath.at(-1)
 
@@ -160,6 +161,8 @@ export default function App() {
           equipmentPath={selectedPath.map((node) => node.name)}
           activeTab={activeTab}
           onTabChange={setActiveTab}
+          notesOpen={notesOpen}
+          onToggleNotes={setNotesOpen}
           headerContent={activeTab === 'Operate' ? (
             <ActiveAlarmSummary
               onViewPoint={openPointDetails}
@@ -183,6 +186,8 @@ export default function App() {
               notes={notes}
               onNotesChange={setNotes}
               onViewDocuments={() => setActiveTab('Associated Documents')}
+              notesOpen={notesOpen}
+              onToggleNotes={setNotesOpen}
             />
           )}
           {activeTab === 'Points' && selectedPoint && (

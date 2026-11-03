@@ -26,6 +26,8 @@ type OperateOverviewProps = EquipmentNotesProps & {
   onBackToPreviousEquipment: () => void
   pointTrendState: OverviewTrendState
   onPointTrendStateChange: (state: OverviewTrendState) => void
+  notesOpen?: boolean
+  onToggleNotes?: (open: boolean) => void
 }
 
 export function OperateOverview({
@@ -43,40 +45,46 @@ export function OperateOverview({
   notes,
   onNotesChange,
   onViewDocuments,
+  notesOpen = true,
+  onToggleNotes,
 }: OperateOverviewProps) {
+  const containerClass = `operate-overview-container${notesOpen ? ' is-notes-open' : ''}`
+
   return (
-    <div className="operate-overview">
-      <h2 className="operate-overview__section-heading">Overview</h2>
-      <nav className="operate-overview__mobile-shortcuts" aria-label="Troubleshooting shortcuts">
-        <a href="#notes-heading">Notes</a>
-        <a href="#field-information-heading">Field information</a>
-        <button type="button" onClick={onViewDocuments}>Documents</button>
-        {relatedEquipmentVisible && <a href="#related-equipment-heading">Related equipment</a>}
-      </nav>
-      <div className="operate-overview__cards">
-        <EquipmentPropertiesCard />
-        <ControllingDevicesCard onViewDevice={onViewDevice} />
-        <EquipmentStateCard />
-      </div>
-      <OperationalRollup onFilterPoints={onFilterPoints} />
-      <KeyPointsSection
-        onViewAllPoints={onViewAllPoints}
-        onSelectPoint={onViewPointDetails}
-      />
-      {currentEquipmentId === 'ahu-sa-01' && (
-        <Suspense fallback={<div className="overview-point-trend__loading" aria-label="Loading Point Trend" />}>
-          <PointTrendPanel state={pointTrendState} onStateChange={onPointTrendStateChange} onViewPoint={onViewPointDetails} />
-        </Suspense>
-      )}
-      {relatedEquipmentVisible && (
-        <RelatedEquipment
-          currentEquipmentId={currentEquipmentId}
-          previousEquipmentName={previousEquipmentName}
-          onSelectEquipment={onSelectRelatedEquipment}
-          onBack={onBackToPreviousEquipment}
+    <div className={containerClass}>
+      <div className="operate-overview">
+        <h2 className="operate-overview__section-heading">Overview</h2>
+        <nav className="operate-overview__mobile-shortcuts" aria-label="Troubleshooting shortcuts">
+          <a href="#notes-heading">Notes</a>
+          <a href="#field-information-heading">Field information</a>
+          <button type="button" onClick={onViewDocuments}>Documents</button>
+          {relatedEquipmentVisible && <a href="#related-equipment-heading">Related equipment</a>}
+        </nav>
+        <div className="operate-overview__cards">
+          <EquipmentPropertiesCard />
+          <ControllingDevicesCard onViewDevice={onViewDevice} />
+          <EquipmentStateCard />
+        </div>
+        <OperationalRollup onFilterPoints={onFilterPoints} />
+        <KeyPointsSection
+          onViewAllPoints={onViewAllPoints}
+          onSelectPoint={onViewPointDetails}
         />
-      )}
-      <EquipmentResources notes={notes} onNotesChange={onNotesChange} />
+        {currentEquipmentId === 'ahu-sa-01' && (
+          <Suspense fallback={<div className="overview-point-trend__loading" aria-label="Loading Point Trend" />}>
+            <PointTrendPanel state={pointTrendState} onStateChange={onPointTrendStateChange} onViewPoint={onViewPointDetails} />
+          </Suspense>
+        )}
+        {relatedEquipmentVisible && (
+          <RelatedEquipment
+            currentEquipmentId={currentEquipmentId}
+            previousEquipmentName={previousEquipmentName}
+            onSelectEquipment={onSelectRelatedEquipment}
+            onBack={onBackToPreviousEquipment}
+          />
+        )}
+      </div>
+      <EquipmentResources notes={notes} onNotesChange={onNotesChange} notesOpen={notesOpen} onToggleNotes={onToggleNotes} />
     </div>
   )
 }

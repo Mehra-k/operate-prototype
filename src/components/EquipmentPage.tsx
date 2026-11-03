@@ -10,6 +10,8 @@ type EquipmentPageProps = {
   onTabChange: (tab: EquipmentTab) => void
   headerContent?: ReactNode
   children?: ReactNode
+  notesOpen?: boolean
+  onToggleNotes?: (open: boolean) => void
 }
 
 const projectBreadcrumbs = ['All Projects', 'ABC Systems Project']
@@ -21,6 +23,8 @@ export function EquipmentPage({
   onTabChange,
   headerContent,
   children,
+  notesOpen = true,
+  onToggleNotes,
 }: EquipmentPageProps) {
   const breadcrumbs = [...projectBreadcrumbs, ...equipmentPath]
 
@@ -42,7 +46,19 @@ export function EquipmentPage({
       </header>
       <div className="equipment-page__scrollable">
         <div className="equipment-page__header">
-          {headerContent}
+          <div className="equipment-page__header-content-wrapper">
+            {headerContent}
+          </div>
+          {activeTab === 'Operate' && !notesOpen && onToggleNotes && (
+            <button
+              className="equipment-page__notes-open-btn"
+              onClick={() => onToggleNotes(true)}
+              aria-label="Open Notes panel"
+              type="button"
+            >
+              <span>Notes</span>
+            </button>
+          )}
           <div className="equipment-page__tabs" role="tablist" aria-label="Equipment views">
             {(['Operate', 'Points', 'Trends', 'Associated Documents'] as const).map((tab) => (
               <button

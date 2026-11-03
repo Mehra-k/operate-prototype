@@ -415,7 +415,17 @@ The following features are **out of scope** for the current prototype and should
    - "Connected" for controller status
    - "Program/Sequence" for program/sequence name field
 8. Attempted Related Equipment connector line fix (reverted due to layout break)
-9. Finalized documentation and verified all features
+9. Added collapsible Notes panel:
+   - Notes column is visible by default on desktop
+   - Users can collapse Notes using a ChevronLeft icon in the Notes header
+   - When collapsed, the main Operate content expands to full available width
+   - No empty Notes column remains when collapsed
+   - Existing card hierarchy and proportions are preserved during expansion
+   - Notes state and content are preserved during collapse/reopen
+   - Users can reopen Notes using a "Notes" button positioned in the top-right of the equipment page header (near the alarm summary and tabs)
+   - The Open Notes button remains accessible at the top of the page without requiring scroll
+   - Original layout is restored when Notes is reopened
+10. Finalized documentation and verified all features
 
 **Not Modified (Preserved from Earlier Work):**
 - Overview card layout and content
@@ -423,7 +433,6 @@ The following features are **out of scope** for the current prototype and should
 - Point Details view
 - Trends tab core functionality
 - Associated Documents tab
-- Notes panel
 - Equipment tree structure
 - Primary navigation
 - EF status colors
