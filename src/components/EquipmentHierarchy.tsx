@@ -7,8 +7,6 @@ import {
   Layers,
   Search,
   Wind,
-  AlertTriangle,
-  Circle,
 } from 'lucide-react'
 import type { EquipmentNodeKind, EquipmentTreeNode } from '../data/equipment.ts'
 
@@ -70,27 +68,18 @@ function countAlarmsByNode(node: EquipmentTreeNode): number {
 function StatusIndicator({ status }: { status: string | undefined }) {
   if (!status) return null
 
+  // Hide OK/healthy status - communicate by absence of indicator
+  if (status === 'ok') {
+    return null
+  }
+
   if (status === 'alarm') {
     return (
       <span
         className="equipment-tree__status equipment-tree__status--alarm"
         aria-label="In alarm"
         title="In alarm"
-      >
-        <AlertTriangle size={10} aria-hidden="true" />
-      </span>
-    )
-  }
-
-  if (status === 'ok') {
-    return (
-      <span
-        className="equipment-tree__status equipment-tree__status--ok"
-        aria-label="OK"
-        title="OK"
-      >
-        <Circle size={8} aria-hidden="true" />
-      </span>
+      />
     )
   }
 
@@ -100,9 +89,7 @@ function StatusIndicator({ status }: { status: string | undefined }) {
         className="equipment-tree__status equipment-tree__status--override"
         aria-label="Overridden"
         title="Overridden"
-      >
-        <Circle size={8} aria-hidden="true" />
-      </span>
+      />
     )
   }
 
@@ -112,9 +99,7 @@ function StatusIndicator({ status }: { status: string | undefined }) {
         className="equipment-tree__status equipment-tree__status--fault"
         aria-label="Fault"
         title="Fault"
-      >
-        <AlertTriangle size={10} aria-hidden="true" />
-      </span>
+      />
     )
   }
 

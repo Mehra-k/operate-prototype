@@ -1,3 +1,4 @@
+import { useState, useRef } from 'react'
 import {
   Area,
   CartesianGrid,
@@ -26,6 +27,7 @@ type PointTrendChartProps = {
   scale: number
   events: OverviewTrendEvent[]
   onSelectEvent: (event: OverviewTrendEvent) => void
+  onManualRangeSelect?: (newStart: number, newEnd: number) => void
 }
 
 export function PointTrendChart({
@@ -37,14 +39,111 @@ export function PointTrendChart({
   scale,
   events,
   onSelectEvent,
+  onManualRangeSelect,
 }: PointTrendChartProps) {
+  const [selectionStart, setSelectionStart] = useState<number | null>(null)
+  const [selectionEnd, setSelectionEnd] = useState<number | null>(null)
+  const [isSelecting, setIsSelecting] = useState(false)
+  const chartContainerRef = useRef<HTMLDivElement>(null)
+  
   const units = [...new Set(series.map((item) => item.unit))]
   const chartData = samples.map((sample) => ({ timestamp: sample.timestamp, ...sample.values }))
   const tickCount = end - start > 24 * 60 * 60 * 1000 ? 8 : 7
   const timeTicks = Array.from({ length: tickCount }, (_, index) => start + index * (end - start) / (tickCount - 1))
 
+  // Calculate pixel-to-timestamp mapping
+  function getTimestampFromPixelX(pixelX: number): number {
+    const container = chartContainerRef.current
+    if (!container) return start
+    const rect = container.getBoundingClientRect()
+    const chartLeft = rect.left
+    const chartRight = rect.right
+    
+    // Account for chart margins (left and right)
+    const plotLeft = chartLeft + 48 + 8 // left axis width + margin
+    const plotRight = chartRight - 12 // right margin
+    const plotWidth = plotRight - plotLeft
+    
+    if (pixelX <= plotLeft) return start
+    if (pixelX >= plotRight) return end
+    
+    const fraction = (pixelX - plotLeft) / plotWidth
+    return Math.round(start + fraction * (end - start))
+  }
+
+  function handleMouseDown(e: React.MouseEvent) {
+    if (e.button !== 0) return // Only left click
+    const timestamp = getTimestampFromPixelX(e.clientX)
+    setSelectionStart(timestamp)
+    setSelectionEnd(timestamp)
+    setIsSelecting(true)
+  }
+
+  function handleMouseMove(e: React.MouseEvent) {
+    if (!isSelecting || selectionStart === null) return
+    const timestamp = getTimestampFromPixelX(e.clientX)
+    setSelectionEnd(timestamp)
+  }
+
+  function handleMouseUp() {
+    if (!isSelecting || selectionStart === null || selectionEnd === null) {
+      setIsSelecting(false)
+      return
+    }
+    setIsSelecting(false)
+    
+    // Ensure start is before end
+    const rangeStart = Math.min(selectionStart, selectionEnd)
+    const rangeEnd = Math.max(selectionStart, selectionEnd)
+    
+    // Only apply if selection is meaningful (not just a click)
+    if (rangeEnd - rangeStart > 60000) { // At least 1 minute
+      onManualRangeSelect?.(rangeStart, rangeEnd)
+      setSelectionStart(null)
+      setSelectionEnd(null)
+    } else {
+      setSelectionStart(null)
+      setSelectionEnd(null)
+    }
+  }
+
+  function handleMouseLeave() {
+    if (isSelecting) {
+      setIsSelecting(false)
+      setSelectionStart(null)
+      setSelectionEnd(null)
+    }
+  }
+
+  // Calculate positions for selection overlay
+  let selectionStartPercent = 0
+  let selectionWidthPercent = 0
+  if (selectionStart !== null && selectionEnd !== null && isSelecting) {
+    const minTime = Math.min(selectionStart, selectionEnd)
+    const maxTime = Math.max(selectionStart, selectionEnd)
+    selectionStartPercent = ((minTime - start) / (end - start)) * 100
+    selectionWidthPercent = ((maxTime - minTime) / (end - start)) * 100
+  }
+
+  const displayStart = selectionStart !== null && isSelecting ? Math.min(selectionStart, selectionEnd!) : null
+  const displayEnd = selectionEnd !== null && isSelecting ? Math.max(selectionStart!, selectionEnd) : null
+  const durationMs = displayStart !== null && displayEnd !== null ? displayEnd - displayStart : 0
+  const durationHours = Math.floor(durationMs / (60 * 60 * 1000))
+  const durationMinutes = Math.floor((durationMs % (60 * 60 * 1000)) / (60 * 1000))
+
   return (
-    <div className="point-trend-chart-scroll" tabIndex={0} role="region" aria-label="Point Trend chart, horizontally scrollable on small screens">
+    <div 
+      className="point-trend-chart-scroll" 
+      tabIndex={0} 
+      role="region" 
+      aria-label="Point Trend chart, horizontally scrollable on small screens"
+      ref={chartContainerRef}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseLeave}
+      style={{ cursor: isSelecting ? 'crosshair' : 'default', position: 'relative' }}
+    >
       <div className="point-trend-chart">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={chartData} margin={{ top: 24, right: 12, bottom: 8, left: 8 }}>
@@ -162,6 +261,40 @@ export function PointTrendChart({
             ))}
           </ComposedChart>
         </ResponsiveContainer>
+        
+        {/* Selection overlay */}
+        {isSelecting && selectionStart !== null && selectionEnd !== null && (
+          <div className="point-trend-selection-overlay">
+            <div 
+              className="point-trend-selection-area"
+              style={{
+                left: `${selectionStartPercent}%`,
+                width: `${selectionWidthPercent}%`,
+              }}
+            >
+              <div className="point-trend-selection-handle point-trend-selection-handle--start" />
+              <div className="point-trend-selection-handle point-trend-selection-handle--end" />
+            </div>
+            
+            <div 
+              className="point-trend-selection-tooltip"
+              style={{
+                left: `${Math.min(selectionStartPercent, selectionStartPercent + selectionWidthPercent) + selectionWidthPercent / 2}%`,
+                transform: 'translateX(-50%)',
+              }}
+            >
+              <div className="point-trend-selection-tooltip-item">
+                <strong>Start:</strong> {displayStart ? formatTrendTimestamp(displayStart) : '--'}
+              </div>
+              <div className="point-trend-selection-tooltip-item">
+                <strong>End:</strong> {displayEnd ? formatTrendTimestamp(displayEnd) : '--'}
+              </div>
+              <div className="point-trend-selection-tooltip-item">
+                <strong>Duration:</strong> {durationHours > 0 ? `${durationHours}h ` : ''}{durationMinutes}m
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

@@ -146,7 +146,7 @@ export function ControllingDevicesCard({
             </button>
             <span className="controlling-devices-card__type">{device.type}</span>
             <div className="controlling-devices-card__detail">
-              <span>Program</span>
+              <span>Program/Sequence</span>
               <span>{device.program}</span>
             </div>
             <div className="controlling-devices-card__detail">

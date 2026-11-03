@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react'
+import { useState } from 'react'
 import { ArrowRight, TrendingUp } from 'lucide-react'
 import { operateOverviewData, type PointFilter } from '../data/operateOverview.ts'
 
@@ -39,6 +40,76 @@ function RollupMetric({ status }: { status: RollupStatus }) {
   )
 }
 
+function RollupPopover({ statusKey }: { statusKey: string }) {
+  const keyPoints = operateOverviewData.keyPoints
+
+  if (statusKey === 'alarm') {
+    const alarmPoints = keyPoints.filter((p) => p.state === 'High' || p.state === 'Low')
+    if (alarmPoints.length === 0) return null
+
+    return (
+      <div className="operational-rollup__popover">
+        <div className="operational-rollup__popover-header">
+          In alarm • {alarmPoints.length} points
+        </div>
+        <div className="operational-rollup__popover-content">
+          {alarmPoints.map((point) => (
+            <div key={point.id} className="operational-rollup__popover-item">
+              <span className="operational-rollup__popover-name">{point.pointName}</span>
+              <span className="operational-rollup__popover-value">
+                {point.value} {point.unit}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (statusKey === 'override') {
+    const overridePoints = keyPoints.filter((p) => p.state === 'Override')
+    if (overridePoints.length === 0) return null
+
+    return (
+      <div className="operational-rollup__popover">
+        <div className="operational-rollup__popover-header">
+          In override • {overridePoints.length} points
+        </div>
+        <div className="operational-rollup__popover-content">
+          {overridePoints.map((point) => (
+            <div key={point.id} className="operational-rollup__popover-item">
+              <span className="operational-rollup__popover-name">{point.pointName}</span>
+              <span className="operational-rollup__popover-value">
+                {point.value} {point.unit}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (statusKey === 'healthy') {
+    const healthyPoints = keyPoints.filter((p) => p.state === 'Normal')
+    if (healthyPoints.length === 0) return null
+
+    return (
+      <div className="operational-rollup__popover">
+        <div className="operational-rollup__popover-header">
+          Healthy • {healthyPoints.length} points
+        </div>
+        <div className="operational-rollup__popover-content operational-rollup__popover-content--compact">
+          <span className="operational-rollup__popover-summary">
+            All equipment operating within normal parameters
+          </span>
+        </div>
+      </div>
+    )
+  }
+
+  return null
+}
+
 function RollupItem({
   status,
   onFilterPoints,
@@ -46,22 +117,43 @@ function RollupItem({
   status: RollupStatus
   onFilterPoints: (filter: PointFilter) => void
 }) {
+  const [isHovering, setIsHovering] = useState(false)
+  const shouldShowPopover = ['alarm', 'override', 'healthy'].includes(status.key)
+
   if (status.filter) {
     return (
-      <button
-        className={`operational-rollup__item is-${status.key}`}
-        type="button"
-        aria-label={`${status.label} ${status.count} / ${status.total}`}
-        onClick={() => onFilterPoints(status.filter as PointFilter)}
+      <div
+        className="operational-rollup__item-wrapper"
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
       >
-        <RollupMetric status={status} />
-      </button>
+        <button
+          className={`operational-rollup__item is-${status.key}`}
+          type="button"
+          aria-label={`${status.label} ${status.count} / ${status.total}`}
+          onClick={() => onFilterPoints(status.filter as PointFilter)}
+        >
+          <RollupMetric status={status} />
+        </button>
+        {shouldShowPopover && isHovering && (
+          <RollupPopover statusKey={status.key} />
+        )}
+      </div>
     )
   }
 
   return (
-    <div className={`operational-rollup__item is-${status.key}`}>
-      <RollupMetric status={status} />
+    <div
+      className="operational-rollup__item-wrapper"
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+    >
+      <div className={`operational-rollup__item is-${status.key}`}>
+        <RollupMetric status={status} />
+      </div>
+      {shouldShowPopover && isHovering && (
+        <RollupPopover statusKey={status.key} />
+      )}
     </div>
   )
 }

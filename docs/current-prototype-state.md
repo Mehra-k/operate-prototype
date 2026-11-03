@@ -1,12 +1,12 @@
 # Current Operate Prototype State
 
-Checkpoint date: November 3, 2026. Read this first when continuing in a new Agent chat, then inspect the referenced code and [requirements](operate-requirements.md). The repository, not past conversation history, is the source of truth.
+Checkpoint date: November 3, 2026 at 13:37 UTC. Read this first when continuing in a new Agent chat, then inspect the referenced code and [requirements](operate-requirements.md). The repository, not past conversation history, is the source of truth.
 
 ## Purpose and Constraints
 
 Operate is a clickable equipment-troubleshooting UX prototype built with React, TypeScript, and Vite. It supports desktop and phone layouts. Everything uses local mock data; there is no backend, API integration, authentication, or server persistence.
 
-Do not redesign, add features, change approved terminology/colors/counts, create branches/repositories, deploy, or commit/push without an explicit request. Preserve working navigation and the existing design language. Do not implement Graphics, historical equipment playback/time-machine, automatic parent-equipment diagnosis, asset-management integration, or real permissions without authorization.
+Do not redesign, add features, change approved terminology/colors/counts, create branches/repositories, deploy, or commit/push without an explicit request. Preserve working navigation and the existing design language. Do not implement Graphics, historical equipment playback/time-machine, automatic parent-equipment diagnosis, asset-management integration, real permissions, or the Phase 1 / Phase 1 & 2 mode toggle without authorization.
 
 ## Architecture and Files
 

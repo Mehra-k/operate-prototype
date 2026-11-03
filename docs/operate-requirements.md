@@ -240,4 +240,192 @@ Approved palette update: November 3, 2026. The existing EF mappings below are th
 - Controller connection wording remains `Connected`. Existing point/status labels, selected states, interactions, and data are unchanged.
 - Ordinary chart-series identity colours, setpoint-change event colours, links, focus/selection styling, document-type icons, and neutral UI controls are not status meanings and retain their existing colours. A disabled form button is not the equipment Disabled status.
 - All nine EF mappings are defined, including Fault, Out of Service, Disabled, and Stale even where the current mock dataset has no corresponding visible record. No new mock states or functionality are added to demonstrate unused mappings.
+
+---
+
+## Currently Implemented (As of November 3, 2026)
+
+The following features are **fully implemented** in the current prototype and verified as working:
+
+### Application Structure & Navigation
+- ✅ Sticky application header, breadcrumb, equipment title, primary left navigation, equipment tree
+- ✅ Content scrolls independently while header/navigation/tree stay visible
+- ✅ Four main tabs: Operate, Points, Trends, Associated Documents
+- ✅ Equipment tree with status indicators (alarm/normal/override/fault/offline)
+- ✅ Aggregated alarm badges on parent location nodes
+- ✅ Primary navigation "Alarms & Faults" badge showing active alarm count
+
+### Alarms & Alerts
+- ✅ Active Alarms section with alarm list, current values, thresholds, timestamps
+- ✅ Acknowledge and Clear buttons (local interaction, no backend)
+- ✅ "View Point" action on each alarm
+- ✅ "View all alarms" filter action
+- ✅ Back button restores equipment and originating tab
+
+### Equipment Overview
+- ✅ Equipment Properties & Field Information merged into single card
+- ✅ Equipment image/photo with location, access, orientation fields
+- ✅ Edit button for Field Information (local form interaction)
+- ✅ Controlling Devices card with "Program/Sequence" and "Connected" terminology
+- ✅ Equipment State card with operating state fields (Mode, Occupancy, etc.)
+- ✅ Customize button to toggle state field visibility
+
+### Operational Roll-up
+- ✅ Three equal-width cards (Healthy, In Alarm, In Override)
+- ✅ Card counts and trends (↑/→ indicators)
+- ✅ Hover popovers on In Alarm and In Override cards with point details
+- ✅ Clickable cards to filter Points view
+
+### Key Points
+- ✅ Grid of 8 point cards with status, value, units, time-updated
+- ✅ EF color-coded status indicators
+- ✅ Click to open Point Details
+- ✅ "View all points" navigation
+
+### Point Details
+- ✅ Current value, unit, status, setpoint
+- ✅ High/low alarm thresholds
+- ✅ Alarm status and why it triggered
+- ✅ Alarm start time
+- ✅ Alarm history list
+- ✅ Override history (shown when override exists)
+- ✅ Back button with tab/filter context restoration
+
+### Inline Point Trend (Operate Tab)
+- ✅ Recharts line chart with Duct Static Pressure and SP series
+- ✅ Preset time ranges (Last 4 Hours, Last 12 Hours, Last 24 Hours, Last 7 Days)
+- ✅ Custom date/time range picker
+- ✅ Manual drag-select on chart with selection overlay and tooltip
+- ✅ Selection shows start/end times and duration
+- ✅ Series visibility toggles
+- ✅ Series focus control (emphasize one, de-emphasize others)
+- ✅ Scale adjustment (auto/manual min/max)
+- ✅ Alarm started, Override applied, Setpoint changed event markers
+- ✅ Event hover/click popovers with details
+- ✅ Events filtered by selected time range
+
+### Trends Tab
+- ✅ Separate "Trend Builder" experience
+- ✅ Pre-built trend views (Airflow + Airflow Setpoint, Reheat + Supply Air + Discharge Air)
+- ✅ Duplicate as custom (creates editable copy)
+- ✅ Custom trend management (rename, add/remove series, delete)
+- ✅ Add points from current equipment, related equipment, or site-wide
+- ✅ Event markers showing in trends
+- ✅ Time range selector in trends
+
+### Related Equipment
+- ✅ SVG relationship diagram showing equipment hierarchy
+- ✅ Status indicator colors (Normal, Alarm, Override, Offline)
+- ✅ Clickable equipment nodes for navigation
+- ✅ Tree selection sync with diagram selection
+- ✅ Expand, Zoom In, Zoom Out, Reset controls
+- ✅ Status legend
+- ✅ Mobile/responsive list view
+
+### Associated Documents
+- ✅ Associated Documents tab with 5 mock documents
+- ✅ Document list with type, size, actions
+- ✅ Preview button (opens modal with placeholder preview)
+- ✅ Download button (simulated download, no actual file operation)
+- ✅ Selection persists across tab switches
+
+### Notes
+- ✅ Always-visible notes input panel
+- ✅ Add new note with author/date/time
+- ✅ Existing notes displayed with author, timestamp, content
+- ✅ Resolve and Delete actions on notes
+- ✅ Notes persist across tab switches during session
+
+### Status Colors & Terminology
+- ✅ EF status color palette applied (red, green, purple, orange)
+- ✅ "Connected" terminology for device status
+- ✅ "Program/Sequence" terminology in Controlling Devices
+- ✅ Colors consistent across all sections (Alarms, Roll-up, Key Points, Tree, Related Equipment, Trends, etc.)
+
+### Responsive Behavior
+- ✅ Desktop layout with all sections visible
+- ✅ Mobile/tablet layout with stacking and list views
+- ✅ Equipment tree collapse/expand on small screens
+- ✅ Overview cards stack vertically on mobile
+- ✅ All functionality preserved on mobile
+
+---
+
+## Future / Not Yet Implemented
+
+The following features are **out of scope** for the current prototype and should not be implemented without explicit authorization:
+
+### Planned but Deferred
+- **Phase 1 / Phase 1 & 2 Mode Toggle** – Decision pending on whether to implement mode switching for different operational views. User has not authorized implementation.
+- **Connector Line Gap Fix** – Related Equipment connector lines have small visual gaps that were originally identified for fixing. A previous attempt to fix caused layout breaking and was reverted. The fix remains deferred pending investigation of alternative approaches that don't affect page layout.
+
+### Out of Scope (Not First Release)
+- **Graphics Tab** – Visual equipment diagrams, floor plans, or equipment-location graphics (may be added as separate tab in future release)
+- **Historical Equipment Playback / Time-Machine** – Ability to view equipment state at past points in time or replay equipment behavior over a historical period
+- **Automatic Parent-Equipment Diagnosis** – Root-cause analysis or automatic propagation of alarms up the equipment hierarchy
+- **Asset-Management Integration** – Inventory tracking, maintenance scheduling, or asset lifecycle management
+- **Real Authentication & Permissions** – User login, role-based access control, or permission enforcement
+- **Backend API & Persistence** – Real data storage, database queries, or server-side business logic
+
+### Mock Data Limitations (By Design)
+- All data is local/client-side only; no backend fetching
+- No real document downloads or file operations
+- Acknowledge/Clear are local interactive controls only (no backend notification or state change)
+- Notes and configuration changes persist only during current session
+- No browser storage, local storage, or session persistence across page reload
+
+### Not Authorized (Requires Explicit Request)
+- Repository transfer to distech-int organization
+- Public GitHub Pages deployment
+- Public repository visibility
+- Source code changes beyond approved UI/UX refinements
+- GitHub settings or environment configuration changes
+- Creation of additional repositories or branches
+
+### Known Limitations Accepted (Not Planned for Fix)
+- Related Equipment connector lines have minor visual gaps (reverted from attempted fix that broke page layout)
+- Chart manual time-range selection may have limitations on touch devices
+- Point trend deep-drilling and period comparisons not implemented
+- No real-time data update simulation or automatic refresh
+- Equipment-context data (alarms, points, overview) remains AHU-SA-01 focused when navigating to related equipment (mock data scope)
+
+---
+
+## Change Log (Current Session)
+
+**Baseline (November 2, 2026):**
+- Prototype stable with Operate, Points, Trends, and Associated Documents tabs
+- Sticky header and navigation layout
+- Operational Roll-up, Key Points, Point Details, Related Equipment, Notes
+
+**Session Additions (November 3, 2026, up to Finalization):**
+1. Extended sticky layout: breadcrumbs and equipment title now stay visible while scrolling
+2. Removed unnecessary scrollbar beside four tabs
+3. Moved Acknowledge/Clear buttons closer to alarm messages in Active Alarms
+4. Added Point Trend time-range selection:
+   - Preset options (Last 4 Hours, Last 12 Hours, Last 24 Hours, Last 7 Days)
+   - Custom date/time picker
+   - Manual drag-select on chart with visual selection overlay
+5. Added series focus and scale adjustment controls to Point Trend
+6. Updated Operational Roll-up:
+   - Fixed equal-width grid layout for three cards
+   - Added hover popovers for In Alarm and In Override with point details
+   - Added trend indicators (↑/→ arrows) and delta counts
+7. Updated equipment-page terminology:
+   - "Connected" for controller status
+   - "Program/Sequence" for program/sequence name field
+8. Attempted Related Equipment connector line fix (reverted due to layout break)
+9. Finalized documentation and verified all features
+
+**Not Modified (Preserved from Earlier Work):**
+- Overview card layout and content
+- Related Equipment diagram hierarchy
+- Point Details view
+- Trends tab core functionality
+- Associated Documents tab
+- Notes panel
+- Equipment tree structure
+- Primary navigation
+- EF status colors
+- Responsive behavior
 - Desktop and mobile reuse the same palette and status selectors; the update does not change sizes, gaps, layout, or navigation.

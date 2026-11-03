@@ -26,7 +26,7 @@ export function EquipmentPage({
 
   return (
     <main className="equipment-page">
-      <header className="equipment-page__header">
+      <header className="equipment-page__sticky-header">
         <nav className="equipment-page__breadcrumbs" aria-label="Breadcrumb">
           {breadcrumbs.map((item, index) => (
             <span className="equipment-page__breadcrumb" key={`${item}-${index}`}>
@@ -39,33 +39,37 @@ export function EquipmentPage({
         <p className="equipment-page__mobile-location">
           {equipmentPath.slice(-3, -1).join(' · ')}
         </p>
-        {headerContent}
-        <div className="equipment-page__tabs" role="tablist" aria-label="Equipment views">
-          {(['Operate', 'Points', 'Trends', 'Associated Documents'] as const).map((tab) => (
-            <button
-              className={`equipment-page__tab${activeTab === tab ? ' is-active' : ''}`}
-              id={`tab-${tab.toLowerCase().replaceAll(' ', '-')}`}
-              key={tab}
-              type="button"
-              role="tab"
-              aria-selected={activeTab === tab}
-              aria-controls="equipment-page-content"
-              onClick={() => onTabChange(tab)}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
       </header>
-      <section
-        className="equipment-page__content"
-        id="equipment-page-content"
-        role="tabpanel"
-        aria-labelledby={`tab-${activeTab.toLowerCase().replaceAll(' ', '-')}`}
-        aria-label={`${activeTab} content`}
-      >
-        {children}
-      </section>
+      <div className="equipment-page__scrollable">
+        <div className="equipment-page__header">
+          {headerContent}
+          <div className="equipment-page__tabs" role="tablist" aria-label="Equipment views">
+            {(['Operate', 'Points', 'Trends', 'Associated Documents'] as const).map((tab) => (
+              <button
+                className={`equipment-page__tab${activeTab === tab ? ' is-active' : ''}`}
+                id={`tab-${tab.toLowerCase().replaceAll(' ', '-')}`}
+                key={tab}
+                type="button"
+                role="tab"
+                aria-selected={activeTab === tab}
+                aria-controls="equipment-page-content"
+                onClick={() => onTabChange(tab)}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+        </div>
+        <section
+          className="equipment-page__content"
+          id="equipment-page-content"
+          role="tabpanel"
+          aria-labelledby={`tab-${activeTab.toLowerCase().replaceAll(' ', '-')}`}
+          aria-label={`${activeTab} content`}
+        >
+          {children}
+        </section>
+      </div>
     </main>
   )
 }

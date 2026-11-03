@@ -59,12 +59,14 @@ function NavigationButton({
       onClick={() => onSelect(item.label)}
     >
       <Icon size={16} strokeWidth={2} aria-hidden="true" />
-      <span>{item.label}</span>
-      {item.badge && item.badge > 0 && (
-        <span className="primary-navigation__badge" aria-label={`${item.badge} active alarm${item.badge > 1 ? 's' : ''}`}>
-          {item.badge}
-        </span>
-      )}
+      <span className="primary-navigation__label-badge">
+        <span>{item.label}</span>
+        {item.badge && item.badge > 0 && (
+          <span className="primary-navigation__badge" aria-label={`${item.badge} active alarm${item.badge > 1 ? 's' : ''}`}>
+            {item.badge}
+          </span>
+        )}
+      </span>
     </button>
   )
 }
