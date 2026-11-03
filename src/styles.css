@@ -608,9 +608,9 @@ body {
 .active-alarm-summary__columns,
 .active-alarm-summary__row {
   display: grid;
-  grid-template-columns: minmax(118px, 1.3fr) minmax(76px, 0.9fr) minmax(120px, 1.15fr) 68px 36px minmax(150px, 1.4fr) minmax(68px, 0.8fr);
+  grid-template-columns: minmax(118px, 1.3fr) minmax(120px, 1.15fr) minmax(70px, 0.9fr) minmax(50px, 0.6fr) minmax(76px, 0.9fr) minmax(150px, 1.4fr) minmax(68px, 0.8fr);
   align-items: center;
-  gap: 3px;
+  gap: 2px 8px;
   padding: 0 8px;
 }
 
@@ -620,6 +620,11 @@ body {
   color: #4e5358;
   font-size: 8px;
   font-weight: 600;
+}
+
+.active-alarm-summary__columns > :nth-child(3),
+.active-alarm-summary__columns > :nth-child(4) {
+  text-align: center;
 }
 
 .active-alarm-summary__row {
@@ -638,7 +643,6 @@ body {
   gap: 5px;
 }
 
-.active-alarm-summary__point svg,
 .active-alarm-summary__condition svg {
   flex: 0 0 auto;
   color: var(--ef-status-alarm-primary);
@@ -655,6 +659,7 @@ body {
 .active-alarm-summary__acknowledge,
 .active-alarm-summary__clear {
   display: flex;
+  justify-content: center;
   align-items: center;
 }
 

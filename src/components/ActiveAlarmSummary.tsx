@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AlertTriangle, ArrowRight, CheckCircle2, ChevronRight, CircleX } from 'lucide-react'
+import { Bell, ArrowRight, CheckCircle2, ChevronRight, CircleX, ArrowDown, ArrowUp } from 'lucide-react'
 import {
   formatPointValue,
   getKeyPoint,
@@ -20,7 +20,7 @@ export function ActiveAlarmSummary({
   return (
     <section className="active-alarm-summary" aria-labelledby="active-alarms-heading">
       <header className="active-alarm-summary__header">
-        <AlertTriangle
+        <Bell
           className="active-alarm-summary__icon"
           size={18}
           fill="currentColor"
@@ -42,10 +42,10 @@ export function ActiveAlarmSummary({
       <div className="active-alarm-summary__table" role="table" aria-label="Active alarms">
         <div className="active-alarm-summary__columns" role="row">
           <span role="columnheader">Point</span>
-          <span role="columnheader">Current Value</span>
           <span role="columnheader">Alarm Message</span>
           <span role="columnheader">Acknowledge</span>
           <span role="columnheader">Clear</span>
+          <span role="columnheader">Current Value</span>
           <span role="columnheader">Time in Alarm</span>
           <span role="columnheader">Action</span>
         </div>
@@ -68,16 +68,18 @@ function AlarmRow({
   const [acknowledged, setAcknowledged] = useState(false)
   const [clearRequested, setClearRequested] = useState(false)
 
+  // Detect Low/High alarms
+  const isLow = alarm.condition.toLowerCase().startsWith('low')
+  const isHigh = alarm.condition.toLowerCase().startsWith('high')
+
   return (
     <div className={`active-alarm-summary__row is-${point?.state.toLowerCase() ?? 'alarm'}`} role="row">
       <span className="active-alarm-summary__point" role="cell">
-        <AlertTriangle size={11} fill="currentColor" aria-hidden="true" />
         {point?.pointName ?? alarm.id}
       </span>
-      <span className="active-alarm-summary__value" role="cell">
-        {point ? formatPointValue(point.value, point.unit) : '—'}
-      </span>
       <span className="active-alarm-summary__condition" role="cell">
+        {isLow && <ArrowDown size={11} aria-hidden="true" />}
+        {isHigh && <ArrowUp size={11} aria-hidden="true" />}
         {alarm.condition}
       </span>
       <span className="active-alarm-summary__acknowledge" role="cell">
@@ -103,6 +105,9 @@ function AlarmRow({
         >
           <CircleX size={13} aria-hidden="true" />
         </button>
+      </span>
+      <span className="active-alarm-summary__value" role="cell">
+        {point ? formatPointValue(point.value, point.unit) : '—'}
       </span>
       <span className="active-alarm-summary__time" role="cell">
         <span>{alarm.timestamp}</span>

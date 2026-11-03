@@ -147,7 +147,18 @@ The preceding sections preserve the original FigJam requirements, unresolved que
 ### Alarm Summary and Equipment State
 
 - The Active Alarm Summary spans the full top content area above the navigation tabs. It retains the existing point names, readings, units, conditions, timing, `View Point`, and `View all alarms` actions.
-- The summary column is labelled `Alarm Message`. Compact Acknowledge and Clear controls provide local toggle/request feedback; Clear does not clear a live alarm, remove the mock record, or change the mock alarm counts.
+- The main Active Alarms header icon is a red Bell/alarm icon using the EF In Alarm primary color (`--ef-status-alarm-primary`).
+- The summary table uses the following column order: **Point** | **Alarm Message** | **Acknowledge** | **Clear** | **Current Value** | **Time in Alarm** | **Action**.
+- **Point column** displays point names as text only (e.g., "Duct Static Pressure", "CO2"). No alarm icons or status indicators appear beside point names.
+- **Alarm Message column** displays the alarm condition text preceded by a Low (↓ downward arrow) or High (↑ upward arrow) direction indicator. Low alarms display `[↓] Low (< threshold)` format; High alarms display `[↑] High (> threshold)` format. Direction icons use the EF In Alarm primary color.
+- **Acknowledge column** displays a centered checkbox control directly under the "Acknowledge" heading. Each alarm row has its own Acknowledge button, horizontally centered within the column.
+- **Clear column** displays a centered circle/cancel control directly under the "Clear" heading. Each alarm row has its own Clear button, horizontally centered within the column.
+- **Current Value column** displays the point's current reading and unit (e.g., "1.2 in wc", "1,180 ppm").
+- **Time in Alarm column** displays the alarm timestamp and duration in parentheses.
+- **Action column** displays the "View Point" link with navigation chevron.
+- Header and data rows use the same grid-template-columns definition to maintain perfect vertical alignment. No overlapping headers or misaligned controls.
+- Acknowledge and Clear controls are visually grouped with the Alarm Message, remaining close together without excessive spacing.
+- Compact Acknowledge and Clear controls provide local toggle/request feedback; Clear does not clear a live alarm, remove the mock record, or change the mock alarm counts.
 - The current status treatment uses the [Established EF Status Colours](#established-ef-status-colours) below: Low/High threshold alarms use EF In Alarm red, Override uses EF Overridden purple, and Normal/Healthy/Connected use EF OK green. Offline uses EF Down / Communication Failure orange. This supersedes the earlier blue Low-alarm and orange Override implementation.
 - Equipment State retains the existing control mode, occupancy, operating mode, fan status, and outdoor-air-damper values. `Customize` allows local selection of visible fields. Alarm and override counts are not duplicated as binary pills in this card.
 
