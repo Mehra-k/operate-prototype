@@ -42,7 +42,9 @@ npm run preview
 
 See [Operate requirements](docs/operate-requirements.md) for the design source and scope. Some destinations remain prototype stubs, document selection does not fetch files, and related equipment reuses the available AHU mock content. Session changes are not persisted to a backend.
 
-The current equipment tabs are Operate, Points, Trends, and Associated Documents. Overview includes the upper equipment/field-information cards, compact Key Points, an inline Point Trend, Related Equipment, and an always-open Notes composer. See [Implemented Prototype Updates](docs/operate-requirements.md#implemented-prototype-updates) for the approved November 2, 2026 changes and local-only behavior.
+The current equipment tabs are Operate, Points, Trends, and Associated Documents. Overview includes the upper equipment/field-information cards, Operational Roll-up with 24-hour trends, compact Key Points, an inline Point Trend, Related Equipment, and an always-open Notes composer. See [Implemented Prototype Updates](docs/operate-requirements.md#implemented-prototype-updates) for the current approved changes and local-only behavior.
+
+Starting a new Agent chat or joining the project? Read [Current Prototype State](docs/current-prototype-state.md) first for architecture, approved UI/terminology, the EF palette, interactions, responsive behavior, and known limitations.
 
 ## Repository hygiene
 

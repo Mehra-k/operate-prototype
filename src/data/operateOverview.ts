@@ -90,9 +90,18 @@ export const operateOverviewData = {
     { label: 'Outdoor Air Damper', value: '25% Open', icon: 'damper' },
   ] satisfies EquipmentStateValue[],
   operationalRollup: [
-    { key: 'healthy', label: 'Healthy', count: 11, total: 14 },
-    { key: 'alarm', label: 'In Alarm', count: 2, total: 14, filter: 'alarm' },
-    { key: 'override', label: 'In Override', count: 1, total: 14, filter: 'override' },
+    {
+      key: 'healthy', label: 'Healthy', count: 11, total: 14,
+      trend: { label: 'Stable', change: '+0 delta', direction: 'flat' },
+    },
+    {
+      key: 'alarm', label: 'In Alarm', count: 2, total: 14, filter: 'alarm',
+      trend: { label: 'Escalating', change: '+1 alarms', direction: 'up' },
+    },
+    {
+      key: 'override', label: 'In Override', count: 1, total: 14, filter: 'override',
+      trend: { label: 'Flat', change: '0 changed', direction: 'flat' },
+    },
   ],
   keyPoints: [
     {

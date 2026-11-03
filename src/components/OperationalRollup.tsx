@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react'
+import { ArrowRight, TrendingUp } from 'lucide-react'
 import { operateOverviewData, type PointFilter } from '../data/operateOverview.ts'
 
 type OperationalRollupProps = {
@@ -10,6 +11,7 @@ type RollupStatus = (typeof operateOverviewData.operationalRollup)[number]
 function RollupMetric({ status }: { status: RollupStatus }) {
   const percentage = Math.round((status.count / status.total) * 100)
   const progressStyle = { width: `${percentage}%` } satisfies CSSProperties
+  const TrendIcon = status.trend.direction === 'up' ? TrendingUp : ArrowRight
 
   return (
     <>
@@ -28,6 +30,11 @@ function RollupMetric({ status }: { status: RollupStatus }) {
         <span style={progressStyle} />
       </span>
       <span className="operational-rollup__percentage">{percentage}%</span>
+      <span className="operational-rollup__trend">
+        <span>Trend:</span>
+        <TrendIcon size={12} aria-hidden="true" />
+        <span>{status.trend.label} ({status.trend.change})</span>
+      </span>
     </>
   )
 }
@@ -63,6 +70,7 @@ export function OperationalRollup({ onFilterPoints }: OperationalRollupProps) {
   return (
     <section className="operational-rollup" aria-labelledby="operational-rollup-heading">
       <h2 id="operational-rollup-heading">Operational Roll-up</h2>
+      <p className="operational-rollup__description">Trend shows change over last 24 h</p>
       <div className="operational-rollup__items">
         {operateOverviewData.operationalRollup.map((status) => (
           <RollupItem

@@ -1,0 +1,98 @@
+# Current Operate Prototype State
+
+Checkpoint date: November 3, 2026. Read this first when continuing in a new Agent chat, then inspect the referenced code and [requirements](operate-requirements.md). The repository, not past conversation history, is the source of truth.
+
+## Purpose and Constraints
+
+Operate is a clickable equipment-troubleshooting UX prototype built with React, TypeScript, and Vite. It supports desktop and phone layouts. Everything uses local mock data; there is no backend, API integration, authentication, or server persistence.
+
+Do not redesign, add features, change approved terminology/colors/counts, create branches/repositories, deploy, or commit/push without an explicit request. Preserve working navigation and the existing design language. Do not implement Graphics, historical equipment playback/time-machine, automatic parent-equipment diagnosis, asset-management integration, or real permissions without authorization.
+
+## Architecture and Files
+
+- `src/main.tsx`: React entry point; initializes EF CSS tokens before rendering.
+- `src/App.tsx`: equipment/tab/point navigation, Back context, notes, document selection, and Overview trend-view state. Navigation is React state, not a router or backend.
+- `src/components/EquipmentPage.tsx`: breadcrumb, equipment header, optional alarm summary, tab row, and content panel; exports `EquipmentTab`.
+- `src/components/OperateOverview.tsx`: composes upper cards, Operational Roll-up, Key Points, inline Point Trend, Related Equipment, and the Notes sidebar.
+- `src/components/EquipmentOverviewCards.tsx`: properties, clickable controllers, and Equipment State/Customize.
+- `src/components/EquipmentResources.tsx`: shared Notes/Documents plus exported Field Information and Documents panels. Do not duplicate these implementations.
+- `src/components/OperationalRollup.tsx`, `KeyPointsSection.tsx`, `FilteredPoints.tsx`, `PointDirectory.tsx`, `PointDetails.tsx`: shared status/point views and interactions.
+- `src/components/RelatedEquipment.tsx`: desktop diagram, mobile list, legend, Expand/Zoom/Reset, and equipment selection.
+- `src/components/PointTrendPanel.tsx` and `PointTrendChart.tsx`: Overview trend management and separate Recharts rendering. `TrendsExperience.tsx` is the existing separate Trends-tab experience. Chart components are lazy-loaded and share Recharts.
+- `src/data/equipment.ts`: site/equipment tree and relationship nodes. `operateOverview.ts`: shared AHU properties, controllers, states, alarms, points, roll-up counts/trends, and point formatting/lookup.
+- `src/data/trends.ts`: catalog, presets, mock values/events, and additional point-detail records. `overviewTrends.ts`: explicit timestamped samples/events and protected Overview presets, including pressure SP.
+- `src/data/equipmentResources.ts`: initial notes, five document entries, and field-location values. `statusColors.ts`: authoritative shared EF palette.
+- `src/styles.css`: shared desktop/mobile styles. `src/assets/air-handling-unit.jpg` is a representative public-domain photo; provenance is in `src/assets/README.md`.
+- `docs/operate-requirements.md`: original FigJam context, implemented updates, EF mappings, and future/unresolved items. Project setup is in `README.md`, `package.json`, `package-lock.json`, `tsconfig.json`, and `vite.config.ts`.
+
+## Implemented Views and Interactions
+
+- Default equipment: AHU-SA-01. Tabs, in order: Operate, Points, Trends, Associated Documents.
+- Operate: full-width Active Alarms above the tabs; upper Properties/Field Information row and Controllers/Equipment State row; roll-up; compact Key Points; inline pressure trend directly above Related Equipment; Notes in the right-side area.
+- Alarm and Key Point selections open the exact Point Details through a shared point ID. View all alarms opens alarm-filtered Points; View all points opens the available eight-record directory. Point Details Back uses the current equipment name and restores the originating tab/filter.
+- Roll-up: Healthy `11 / 14` with `Stable (+0 delta)`; In Alarm `2 / 14` with `Escalating (+1 alarms)`; In Override `1 / 14` with `Flat (0 changed)`. The heading's supporting text is `Trend shows change over last 24 h`. Trend icons use the corresponding EF primary colors; all desktop cards stay compact/aligned.
+- In Alarm and In Override remain clickable filters for the two alarm points and Supply Fan Speed respectively. Healthy has no extra interaction.
+- Related Equipment: Chiller CH-01, AHU-SA-02/AHU-SA-01, VAV-01 through VAV-04, and a non-navigable `+9 more VAVs` aggregate. Named nodes update the equipment header/tree and offer Back; Expand/Zoom/Reset and Normal/Alarm/Override/Offline legend are retained.
+- Point Details shows the selected point, reading/unit, state, available setpoint/alarm information and timing, a trend placeholder, and available alarm-history content. No synthetic override history is shown when none exists.
+- Inline Point Trend defaults to Duct Static Pressure + Duct Static Pressure SP, with a Reheat/Supply Air Temperature/Discharge Air Temperature alternative. Supports 4h/12h/24h/7d ranges, tooltip/hover line, visibility/focus/scale, event hover/click/keyboard controls, and exact View point navigation. Presets are protected; duplicate before editing. Custom views support create/rename/remove and series additions/removals from current equipment, related equipment, and wider site.
+- Separate Trends tab supports the original airflow and reheat comparisons, 12h/24h ranges, hover values, focus/scale, inline event details, View Point, three-source point additions, and duplicate/remove custom views. Do not silently merge it with the Overview panel or assume their management features are identical.
+- Associated Documents appears only in its tab. Existing five local entries remain selectable; selection persists across tabs but no documents are downloaded/fetched.
+- Notes has an always-visible input, Cancel, and Add note alongside existing records. Cancel clears the draft without closing it. Add creates author/date/time metadata; Resolve/Delete work without real permissions. Saved notes and document selection survive tab switches in the current session.
+- Field Information is rendered once beside Properties, with a left image, Location/Access/Orientation, and Edit. Its local form supports Save/Cancel. Customize chooses visible Equipment State fields. Alarm Acknowledge/Clear controls provide local toggle/request feedback; Clear does not remove mock alarm records or change counts.
+
+## Approved UI and Terminology
+
+- Controller connection status is **Connected**, never Online. The internal `controlling-devices-card__online` CSS class is a legacy identifier, not visible wording; do not change it merely to rename UI text.
+- Key Point cards show only name, value/unit, status, update time, and navigation chevron. No SP/setpoint or alarm-condition text, decorative status dots, or trend arrows belong inside these cards. Data/Point Details still retain available parameters.
+- The upper area uses available main-column width with consistent gaps. Field Information moved out of the lower resources; image cropping uses `object-fit: cover` without distortion.
+- Associated Documents is directly after Trends; do not restore a duplicate Overview document section. Notes fills the right-side upper-information/roll-up area, not an excessively tall empty column beside every chart.
+
+## EF Status Palette
+
+EF is the source of truth. `statusColors.ts` exports `efStatusColors`; startup exposes `--ef-status-<status>-primary/secondary`. Use primary for strong status text/dots/icons/borders/progress; existing pale backgrounds derive from secondary colors. Keep ordinary links, chart-series identity colors, selection outlines, and neutral form controls unchanged.
+
+| Status | Primary | Secondary |
+| --- | --- | --- |
+| In Alarm | `#BE2434` | `#FB6265` |
+| Down / Communication Failure | `#C0570D` | `#EAB448` |
+| Fault | `#C0570D` | `#EAB448` |
+| Out of Service | `#BE2434` | `#FB6265` |
+| Overridden | `#9781E2` | `#9781E2` |
+| Unacknowledged Alarm | `#BE2434` | `#FB6265` |
+| Disabled | `#505050` | `#CCCCCC` |
+| Stale | `#FDB813` | `#FDB813` |
+| OK / Default | `#358600` | `#A7D987` |
+
+Low/High threshold alarms map to In Alarm; Offline maps to Down; Override maps to Overridden; Normal/Healthy/Connected and resolved-note indicators use OK. Earlier blue Low-alarm and orange Override styling is historical and superseded. Unused mappings do not imply new mock states.
+
+## Mock Data and Responsive Behavior
+
+- Alarm point names/readings and override filtering reuse canonical Key Points. Roll-up totals/trend deltas are fixed local examples, not computed analytics. The 14 total points include six unspecified records; do not invent them. Trends use generated/interpolated local sequences with UTC timestamps, not live history.
+- App-level notes, document selection, and Overview custom configurations persist through tab navigation, not browser reloads. Draft notes, presentation state, Field Information edits, and Equipment State visibility can reset on remount.
+- Desktop: compact header, primary rail, tree, breadcrumb/tabs, two-column main/sidebar composition, equal-width upper cards, three roll-up cards with bars/trends, four-column Key Points, and a full relationship diagram.
+- Below 768px: stacked shell with fixed bottom primary navigation, compact tree, equipment/location and alarms near the top, compact Equipment State, Notes/Field Information access, and document-tab shortcut. Healthy/progress bars are hidden in roll-up; alarm/override trends remain. Key Points use two columns/controlled overflow; Related Equipment uses a compact clickable list. The separate Trends tab uses compact series values; the Overview trend uses contained horizontal chart scrolling. Narrow tabs can scroll without widening the page.
+
+## Known Limitations and Future Items
+
+- Related equipment header/tree navigation is implemented, but overview/alarm/resource content reuses AHU-SA-01's available dataset; do not present this as complete per-equipment data.
+- Device names select the Command Center stub; no device-detail view exists. Other unimplemented primary destinations remain stubs. Do not invent destination screens without approval.
+- Document content is mocked; the image is representative, not the actual AHU. No external storage or asset-management integration exists.
+- Notes permissions, production state-configuration policy, and deployment/sharing are not implemented. The GitHub repository is private, but there is no shared hosted deployment; localhost is accessible only on the developer machine. Private source alone must not be treated as private website access control.
+- Preserve Graphics, historical playback, automated diagnostic warnings, real permissions, and integrations as future/unresolved concepts in the requirements, not implemented features.
+
+## Run, Build, and Git
+
+Use Node.js 22.12+ on a supported LTS release (24 LTS recommended) and npm. From the repository root:
+
+```sh
+npm ci
+npm run dev
+npm run build
+npm run preview
+```
+
+Vite prints the local URL, normally `http://localhost:5173/`; existing development sessions used `http://localhost:5174/` because 5173 was occupied. `build` runs TypeScript checking and Vite; `preview` serves the generated build locally. There is no configured lint/test script; browser interaction checks supplement the build.
+
+The existing branch is `main`, with `origin` at `https://github.com/Mehra-k/operate-prototype.git`. The repository is private and personally owned by Mehra-k; it is not currently owned by a company organisation. Do not create another repository, change visibility, or deploy without approval. Inspect `git status`, `git log -1`, and the configured remote to establish current checkpoint identity instead of relying on a hard-coded hash.
+
+`.gitignore` excludes dependencies, `dist/`, TypeScript caches, environment/credential files, logs, temporary files, and editor/system state. Source, local assets/provenance, docs, lockfile, and required configuration belong together here. Never commit secrets. Commit and push only when explicitly authorized, and verify `main`/`origin/main` synchronization afterward.

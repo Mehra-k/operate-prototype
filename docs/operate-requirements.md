@@ -134,7 +134,7 @@ These are not changes required for the initial prototype unless later confirmed:
 
 ## Implemented Prototype Updates
 
-Approved version: November 2, 2026.
+Current checkpoint: November 3, 2026. This includes the November 2 approved UI refinements, the established EF palette, and the latest Operational Roll-up trend rows. For a repository-based continuation guide, see [Current Prototype State](current-prototype-state.md).
 
 The preceding sections preserve the original FigJam requirements, unresolved questions, and future ideas. This section records the subsequently approved prototype refinements and takes precedence when describing the current implemented UI. Items described here are local prototype behavior, not production services or permission policies.
 
@@ -148,8 +148,19 @@ The preceding sections preserve the original FigJam requirements, unresolved que
 
 - The Active Alarm Summary spans the full top content area above the navigation tabs. It retains the existing point names, readings, units, conditions, timing, `View Point`, and `View all alarms` actions.
 - The summary column is labelled `Alarm Message`. Compact Acknowledge and Clear controls provide local toggle/request feedback; Clear does not clear a live alarm, remove the mock record, or change the mock alarm counts.
-- Low status uses blue consistently across the alarm message, Key Points, point lists, Point Details, and relevant trend indicators. High remains red, Override remains orange, and the Normal status cue remains green.
+- The current status treatment uses the [Established EF Status Colours](#established-ef-status-colours) below: Low/High threshold alarms use EF In Alarm red, Override uses EF Overridden purple, and Normal/Healthy/Connected use EF OK green. Offline uses EF Down / Communication Failure orange. This supersedes the earlier blue Low-alarm and orange Override implementation.
 - Equipment State retains the existing control mode, occupancy, operating mode, fan status, and outdoor-air-damper values. `Customize` allows local selection of visible fields. Alarm and override counts are not duplicated as binary pills in this card.
+
+### Operational Roll-up and 24-Hour Trends
+
+- All three desktop cards retain the status name and count at the top, the existing progress/status bar and percentage, and a compact trend row underneath. Cards share a consistent height and alignment.
+- The supporting text directly under the section heading is `Trend shows change over last 24 h`.
+- Healthy remains `11 / 14` and displays `Trend: Stable (+0 delta)` with a flat/right direction indicator using EF OK green.
+- In Alarm remains `2 / 14` and displays `Trend: Escalating (+1 alarms)` with an upward direction indicator using EF In Alarm red.
+- In Override remains `1 / 14` and displays `Trend: Flat (0 changed)` with a flat/right direction indicator using EF Overridden purple.
+- Trend labels, changes, and direction are local values on the shared `operationalRollup` mock records; they do not imply live calculations, diagnosis, or backend history.
+- In Alarm still opens the Points tab filtered to Duct Static Pressure and CO2. In Override still opens the Points tab filtered to Supply Fan Speed. Healthy does not gain a new interaction.
+- Mobile preserves the approved priority treatment: Healthy and large progress bars are hidden; the alarm/override cards keep their trend rows and tap targets. No other section or navigation flow was redesigned for this update.
 
 ### Compact Key Points
 
