@@ -64,7 +64,6 @@ export const operateOverviewData = {
     { label: 'Type', value: 'AHU' },
     { label: 'Subtype', value: 'Built-Up' },
     { label: 'Assigned Space', value: 'Floor 1 - Tower A' },
-    { label: 'Sequence', value: 'AHU Standard v2.3' },
     { label: 'Description', value: 'Supply Air AHU serving Tower A Floor 1' },
     { label: 'Last Updated', value: 'Oct 28, 2026, 2:02 PM' },
   ] satisfies EquipmentProperty[],

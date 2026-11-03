@@ -1,7 +1,10 @@
 import { useRef, useState, type ReactNode } from 'react'
 import {
   Building2,
+  Compass,
   Fan,
+  MapPin,
+  Pencil,
   Settings2,
   Snowflake,
   Wind,
@@ -12,6 +15,9 @@ import {
   operateOverviewData,
   type EquipmentStateValue,
 } from '../data/operateOverview.ts'
+import { fieldInformation } from '../data/equipmentResources.ts'
+
+const equipmentImage = new URL('../assets/air-handling-unit.jpg', import.meta.url).href
 
 function OverviewCard({
   title,
@@ -33,17 +39,91 @@ function OverviewCard({
 }
 
 export function EquipmentPropertiesCard() {
+  const [information, setInformation] = useState(fieldInformation)
+  const [fieldDraft, setFieldDraft] = useState(fieldInformation)
+  const editDialog = useRef<HTMLDialogElement>(null)
+
+  function saveFieldInformation(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setInformation({ location: fieldDraft.location.trim(), access: fieldDraft.access.trim(), orientation: fieldDraft.orientation.trim() })
+    editDialog.current?.close()
+  }
+
   return (
-    <OverviewCard title="Equipment Properties" className="equipment-properties-card">
-      <dl className="equipment-properties-card__list">
-        {operateOverviewData.properties.map((property) => (
-          <div className="equipment-properties-card__row" key={property.label}>
-            <dt>{property.label}</dt>
-            <dd>{property.value}</dd>
+    <>
+      <OverviewCard 
+        title="Equipment Properties & Field Information" 
+        className="equipment-properties-card combined-info-card"
+      >
+        <div className="combined-info-card__content">
+          <div className="combined-info-card__properties">
+            <h3 className="combined-info-card__subheading">Equipment Properties</h3>
+            <dl className="equipment-properties-card__list">
+              {operateOverviewData.properties.map((property) => (
+                <div className="equipment-properties-card__row" key={property.label}>
+                  <dt>{property.label}</dt>
+                  <dd>{property.value}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
-        ))}
-      </dl>
-    </OverviewCard>
+          <div className="combined-info-card__field-info">
+            <div className="combined-info-card__field-heading">
+              <h3 className="combined-info-card__subheading">Field Information</h3>
+              <button className="equipment-resource-panel__header-action" type="button" onClick={() => {
+                setFieldDraft(information)
+                editDialog.current?.showModal()
+              }}>
+                <Pencil size={12} aria-hidden="true" />
+                Edit
+              </button>
+            </div>
+            <div className="field-information-panel__body">
+              <img
+                className="field-information-panel__photo"
+                src={equipmentImage}
+                alt="Representative air-handling unit"
+                title="Representative equipment photo by P199, Wikimedia Commons, public domain"
+                width={320}
+                height={240}
+              />
+              <dl className="field-information-panel__list">
+                <div>
+                  <MapPin size={13} aria-hidden="true" />
+                  <dt>Location</dt>
+                  <dd>{information.location}</dd>
+                </div>
+                <div>
+                  <MapPin size={13} aria-hidden="true" />
+                  <dt>Access</dt>
+                  <dd>{information.access}</dd>
+                </div>
+                <div>
+                  <Compass size={13} aria-hidden="true" />
+                  <dt>Orientation</dt>
+                  <dd>{information.orientation}</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </OverviewCard>
+      <dialog className="equipment-state-customize field-information-panel__edit" ref={editDialog} aria-labelledby="edit-field-information-heading">
+        <header>
+          <h3 id="edit-field-information-heading">Edit Field Information</h3>
+          <button type="button" title="Close" aria-label="Close field information editor" onClick={() => editDialog.current?.close()}><X size={16} aria-hidden="true" /></button>
+        </header>
+        <form onSubmit={saveFieldInformation}>
+          <label>Location<input value={fieldDraft.location} onChange={(event) => setFieldDraft((current) => ({ ...current, location: event.target.value }))} required /></label>
+          <label>Access<input value={fieldDraft.access} onChange={(event) => setFieldDraft((current) => ({ ...current, access: event.target.value }))} required /></label>
+          <label>Orientation<textarea value={fieldDraft.orientation} onChange={(event) => setFieldDraft((current) => ({ ...current, orientation: event.target.value }))} required /></label>
+          <footer>
+            <button type="button" className="equipment-state-card__customize" onClick={() => editDialog.current?.close()}>Cancel</button>
+            <button type="submit" className="equipment-state-card__customize" disabled={!fieldDraft.location.trim() || !fieldDraft.access.trim() || !fieldDraft.orientation.trim()}>Save</button>
+          </footer>
+        </form>
+      </dialog>
+    </>
   )
 }
 

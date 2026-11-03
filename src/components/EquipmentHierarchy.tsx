@@ -7,6 +7,8 @@ import {
   Layers,
   Search,
   Wind,
+  AlertTriangle,
+  Circle,
 } from 'lucide-react'
 import type { EquipmentNodeKind, EquipmentTreeNode } from '../data/equipment.ts'
 
@@ -54,6 +56,81 @@ function collectParentIds(nodes: EquipmentTreeNode[]): Set<string> {
   return expandedIds
 }
 
+function countAlarmsByNode(node: EquipmentTreeNode): number {
+  let count = 0
+  if (node.status === 'alarm') count += 1
+  if (node.children) {
+    for (const child of node.children) {
+      count += countAlarmsByNode(child)
+    }
+  }
+  return count
+}
+
+function StatusIndicator({ status }: { status: string | undefined }) {
+  if (!status) return null
+
+  if (status === 'alarm') {
+    return (
+      <span
+        className="equipment-tree__status equipment-tree__status--alarm"
+        aria-label="In alarm"
+        title="In alarm"
+      >
+        <AlertTriangle size={10} aria-hidden="true" />
+      </span>
+    )
+  }
+
+  if (status === 'ok') {
+    return (
+      <span
+        className="equipment-tree__status equipment-tree__status--ok"
+        aria-label="OK"
+        title="OK"
+      >
+        <Circle size={8} aria-hidden="true" />
+      </span>
+    )
+  }
+
+  if (status === 'override') {
+    return (
+      <span
+        className="equipment-tree__status equipment-tree__status--override"
+        aria-label="Overridden"
+        title="Overridden"
+      >
+        <Circle size={8} aria-hidden="true" />
+      </span>
+    )
+  }
+
+  if (status === 'fault') {
+    return (
+      <span
+        className="equipment-tree__status equipment-tree__status--fault"
+        aria-label="Fault"
+        title="Fault"
+      >
+        <AlertTriangle size={10} aria-hidden="true" />
+      </span>
+    )
+  }
+
+  return null
+}
+
+function AlarmCountBadge({ count }: { count: number }) {
+  if (count === 0) return null
+
+  return (
+    <span className="equipment-tree__alarm-badge" aria-label={`${count} alarm${count > 1 ? 's' : ''}`}>
+      {count}
+    </span>
+  )
+}
+
 function TreeNode({
   node,
   depth,
@@ -72,6 +149,7 @@ function TreeNode({
   const hasChildren = Boolean(node.children?.length)
   const expanded = expandedIds.has(node.id)
   const Icon = nodeIcons[node.kind] ?? Box
+  const alarmCount = hasChildren ? countAlarmsByNode(node) : 0
 
   return (
     <li className="equipment-tree__branch">
@@ -99,10 +177,11 @@ function TreeNode({
         >
           <Icon size={12} strokeWidth={1.8} aria-hidden="true" />
           <span>{node.name}</span>
-          {node.alarm && (
-            <span className="equipment-tree__alarm" aria-label="In alarm" />
-          )}
         </button>
+        <div className="equipment-tree__indicators">
+          {alarmCount > 0 && <AlarmCountBadge count={alarmCount} />}
+          <StatusIndicator status={node.status} />
+        </div>
       </div>
       {hasChildren && expanded && (
         <ul className="equipment-tree__children">

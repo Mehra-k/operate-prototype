@@ -15,6 +15,12 @@ export type EquipmentDocument = {
   size: string
 }
 
+export type FieldInformation = {
+  location: string
+  access: string
+  orientation: string
+}
+
 export const initialEquipmentNotes: EquipmentNote[] = [
   {
     id: 'co2-investigation',

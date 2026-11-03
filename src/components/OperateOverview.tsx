@@ -8,7 +8,7 @@ import { OperationalRollup } from './OperationalRollup.tsx'
 import { KeyPointsSection } from './KeyPointsSection.tsx'
 import type { PointFilter } from '../data/operateOverview.ts'
 import { RelatedEquipment } from './RelatedEquipment.tsx'
-import { EquipmentResources, FieldInformationPanel, type EquipmentNotesProps } from './EquipmentResources.tsx'
+import { EquipmentResources, type EquipmentNotesProps } from './EquipmentResources.tsx'
 import type { OverviewTrendState } from '../data/overviewTrends.ts'
 
 const PointTrendPanel = lazy(() => import('./PointTrendPanel.tsx'))
@@ -55,7 +55,6 @@ export function OperateOverview({
       </nav>
       <div className="operate-overview__cards">
         <EquipmentPropertiesCard />
-        <FieldInformationPanel />
         <ControllingDevicesCard onViewDevice={onViewDevice} />
         <EquipmentStateCard />
       </div>

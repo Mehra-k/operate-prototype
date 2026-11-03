@@ -1,18 +1,16 @@
-import { useRef, useState, type Dispatch, type FormEvent, type SetStateAction } from 'react'
+import { useRef, useState, type Dispatch, type FormEvent, type ReactNode, type SetStateAction } from 'react'
 import {
   Archive,
   Check,
-  Compass,
+  Download,
   FileSpreadsheet,
   FileText,
-  MapPin,
-  Pencil,
+  Expand,
   Trash2,
   X,
 } from 'lucide-react'
 import {
   equipmentDocuments,
-  fieldInformation,
   type EquipmentDocument,
   type EquipmentNote,
 } from '../data/equipmentResources.ts'
@@ -168,102 +166,143 @@ export function DocumentsPanel({
   selectedDocumentId: string | null
   onSelectDocument: (documentId: string) => void
 }) {
-  return (
-    <section className="equipment-resource-panel documents-panel" aria-labelledby="documents-heading">
-      <header className="equipment-resource-panel__header">
-        <h2 id="documents-heading">Associated Documents</h2>
-        <span>{equipmentDocuments.length}</span>
-      </header>
-      <div className="documents-panel__list">
-        {equipmentDocuments.map((document) => (
-          <button
-            className={`documents-panel__document${selectedDocumentId === document.id ? ' is-selected' : ''}`}
-            type="button"
-            key={document.id}
-            aria-pressed={selectedDocumentId === document.id}
-            onClick={() => onSelectDocument(document.id)}
-          >
-            <span className={`documents-panel__icon is-${document.type.toLowerCase()}`}>
-              <DocumentIcon type={document.type} />
-            </span>
-            <span className="documents-panel__details">
-              <strong>{document.name}</strong>
-              <small>{document.type} · {document.size}</small>
-            </span>
-          </button>
-        ))}
-      </div>
-    </section>
-  )
-}
+  const [previewDocument, setPreviewDocument] = useState<EquipmentDocument | null>(null)
+  const previewDialog = useRef<HTMLDialogElement>(null)
 
-export function FieldInformationPanel() {
-  const [information, setInformation] = useState(fieldInformation)
-  const [draft, setDraft] = useState(fieldInformation)
-  const editDialog = useRef<HTMLDialogElement>(null)
+  function openPreview(document: EquipmentDocument, event: React.MouseEvent) {
+    event.stopPropagation()
+    setPreviewDocument(document)
+    previewDialog.current?.showModal()
+  }
 
-  function saveInformation(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    setInformation({ location: draft.location.trim(), access: draft.access.trim(), orientation: draft.orientation.trim() })
-    editDialog.current?.close()
+  function closePreview() {
+    previewDialog.current?.close()
+    setPreviewDocument(null)
+  }
+
+  function handleDownload(document: EquipmentDocument, event: React.MouseEvent) {
+    event.stopPropagation()
+    // For prototype: show a browser download dialog for actual files if available
+    // Otherwise just trigger the browser's download mechanism
+    console.log(`Download triggered for: ${document.name}`)
+    // In a real app, this would trigger a backend download or link to actual file
   }
 
   return (
-    <section className="equipment-resource-panel field-information-panel" aria-labelledby="field-information-heading">
-      <header className="equipment-resource-panel__header">
-        <h2 id="field-information-heading">Field Information</h2>
-        <button className="equipment-resource-panel__header-action" type="button" onClick={() => {
-          setDraft(information)
-          editDialog.current?.showModal()
-        }}>
-          <Pencil size={12} aria-hidden="true" />
-          Edit
-        </button>
-      </header>
-      <div className="field-information-panel__body">
-      <img
-        className="field-information-panel__photo"
-        src={equipmentImage}
-        alt="Representative air-handling unit"
-        title="Representative equipment photo by P199, Wikimedia Commons, public domain"
-        width={320}
-        height={240}
-      />
-      <dl className="field-information-panel__list">
-        <div>
-          <MapPin size={13} aria-hidden="true" />
-          <dt>Location</dt>
-          <dd>{information.location}</dd>
-        </div>
-        <div>
-          <MapPin size={13} aria-hidden="true" />
-          <dt>Access</dt>
-          <dd>{information.access}</dd>
-        </div>
-        <div>
-          <Compass size={13} aria-hidden="true" />
-          <dt>Orientation</dt>
-          <dd>{information.orientation}</dd>
-        </div>
-      </dl>
-      </div>
-      <dialog className="equipment-state-customize field-information-panel__edit" ref={editDialog} aria-labelledby="edit-field-information-heading">
-        <header>
-          <h3 id="edit-field-information-heading">Edit Field Information</h3>
-          <button type="button" title="Close" aria-label="Close field information editor" onClick={() => editDialog.current?.close()}><X size={16} aria-hidden="true" /></button>
+    <>
+      <section className="equipment-resource-panel documents-panel" aria-labelledby="documents-heading">
+        <header className="equipment-resource-panel__header">
+          <h2 id="documents-heading">Associated Documents</h2>
+          <span>{equipmentDocuments.length}</span>
         </header>
-        <form onSubmit={saveInformation}>
-          <label>Location<input value={draft.location} onChange={(event) => setDraft((current) => ({ ...current, location: event.target.value }))} required /></label>
-          <label>Access<input value={draft.access} onChange={(event) => setDraft((current) => ({ ...current, access: event.target.value }))} required /></label>
-          <label>Orientation<textarea value={draft.orientation} onChange={(event) => setDraft((current) => ({ ...current, orientation: event.target.value }))} required /></label>
-          <footer>
-            <button type="button" className="equipment-state-card__customize" onClick={() => editDialog.current?.close()}>Cancel</button>
-            <button type="submit" className="equipment-state-card__customize" disabled={!draft.location.trim() || !draft.access.trim() || !draft.orientation.trim()}>Save</button>
-          </footer>
-        </form>
+        <div className="documents-panel__list">
+          {equipmentDocuments.map((document) => (
+            <div
+              className={`documents-panel__row${selectedDocumentId === document.id ? ' is-selected' : ''}`}
+              key={document.id}
+            >
+              <button
+                className="documents-panel__document"
+                type="button"
+                aria-pressed={selectedDocumentId === document.id}
+                onClick={() => onSelectDocument(document.id)}
+              >
+                <span className={`documents-panel__icon is-${document.type.toLowerCase()}`}>
+                  <DocumentIcon type={document.type} />
+                </span>
+                <span className="documents-panel__details">
+                  <strong>{document.name}</strong>
+                  <small>{document.type} · {document.size}</small>
+                </span>
+              </button>
+              <div className="documents-panel__actions">
+                <button
+                  className="documents-panel__action"
+                  type="button"
+                  title={`Preview ${document.name}`}
+                  aria-label={`Preview ${document.name}`}
+                  onClick={(e) => openPreview(document, e)}
+                >
+                  <Expand size={16} aria-hidden="true" />
+                </button>
+                <button
+                  className="documents-panel__action"
+                  type="button"
+                  title={`Download ${document.name}`}
+                  aria-label={`Download ${document.name}`}
+                  onClick={(e) => handleDownload(document, e)}
+                >
+                  <Download size={16} aria-hidden="true" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <dialog className="documents-preview-dialog" ref={previewDialog} aria-labelledby="preview-heading">
+        {previewDocument && (
+          <>
+            <header className="documents-preview-dialog__header">
+              <h2 id="preview-heading">Preview: {previewDocument.name}</h2>
+              <button
+                type="button"
+                aria-label="Close preview"
+                title="Close"
+                onClick={closePreview}
+              >
+                <X size={16} aria-hidden="true" />
+              </button>
+            </header>
+            <div className="documents-preview-dialog__content">
+              {previewDocument.id === 'equipment-photos' ? (
+                <div className="documents-preview-dialog__image-gallery">
+                  <img
+                    src={equipmentImage}
+                    alt="Equipment photo 1 of 3"
+                    className="documents-preview-dialog__preview-image"
+                  />
+                  <img
+                    src={equipmentImage}
+                    alt="Equipment photo 2 of 3"
+                    className="documents-preview-dialog__preview-image"
+                  />
+                  <img
+                    src={equipmentImage}
+                    alt="Equipment photo 3 of 3"
+                    className="documents-preview-dialog__preview-image"
+                  />
+                  <p className="documents-preview-dialog__note">Equipment Photos (3 images)</p>
+                </div>
+              ) : (
+                <div className="documents-preview-dialog__placeholder">
+                  <FileIcon type={previewDocument.type} size={48} />
+                  <p><strong>{previewDocument.name}</strong></p>
+                  <p className="documents-preview-dialog__file-info">
+                    {previewDocument.type} file · {previewDocument.size}
+                  </p>
+                  <p className="documents-preview-dialog__message">
+                    Document preview not available in this prototype.
+                  </p>
+                </div>
+              )}
+            </div>
+            <footer className="documents-preview-dialog__footer">
+              <button type="button" onClick={closePreview} className="documents-preview-dialog__close">
+                Close
+              </button>
+            </footer>
+          </>
+        )}
       </dialog>
-    </section>
+    </>
   )
+}
+
+function FileIcon({ type, size }: { type: EquipmentDocument['type']; size: number }): ReactNode {
+  if (type === 'XLSX') return <FileSpreadsheet size={size} aria-hidden="true" />
+  if (type === 'ZIP') return <Archive size={size} aria-hidden="true" />
+  return <FileText size={size} aria-hidden="true" />
 }
 
 export function EquipmentResources({ notes, onNotesChange }: EquipmentNotesProps) {

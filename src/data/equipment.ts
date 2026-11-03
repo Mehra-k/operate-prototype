@@ -1,10 +1,12 @@
 export type EquipmentNodeKind = 'site' | 'building' | 'floor' | 'equipment'
 
+export type EquipmentStatus = 'alarm' | 'ok' | 'override' | 'fault'
+
 export type EquipmentTreeNode = {
   id: string
   name: string
   kind: EquipmentNodeKind
-  alarm?: boolean
+  status?: EquipmentStatus
   children?: EquipmentTreeNode[]
 }
 
@@ -72,24 +74,24 @@ export const equipmentHierarchy: EquipmentTreeNode[] = [
             name: 'Floor 1',
             kind: 'floor',
             children: [
-              { id: 'ahu-sa-01', name: 'AHU-SA-01', kind: 'equipment', alarm: true },
-              { id: 'ahu-sa-02', name: 'AHU-SA-02', kind: 'equipment' },
-              { id: 'chiller-ch-01', name: 'Chiller CH-01', kind: 'equipment' },
-              { id: 'vav-01', name: 'VAV-01', kind: 'equipment' },
-              { id: 'vav-02', name: 'VAV-02', kind: 'equipment' },
-              { id: 'vav-03', name: 'VAV-03', kind: 'equipment' },
-              { id: 'vav-04', name: 'VAV-04', kind: 'equipment' },
-              { id: 'ahu-2', name: 'AHU 2', kind: 'equipment' },
-              { id: 'chws', name: 'CHWS', kind: 'equipment' },
+              { id: 'ahu-sa-01', name: 'AHU-SA-01', kind: 'equipment', status: 'alarm' },
+              { id: 'ahu-sa-02', name: 'AHU-SA-02', kind: 'equipment', status: 'ok' },
+              { id: 'chiller-ch-01', name: 'Chiller CH-01', kind: 'equipment', status: 'ok' },
+              { id: 'vav-01', name: 'VAV-01', kind: 'equipment', status: 'alarm' },
+              { id: 'vav-02', name: 'VAV-02', kind: 'equipment', status: 'override' },
+              { id: 'vav-03', name: 'VAV-03', kind: 'equipment', status: 'ok' },
+              { id: 'vav-04', name: 'VAV-04', kind: 'equipment', status: 'ok' },
+              { id: 'ahu-2', name: 'AHU 2', kind: 'equipment', status: 'ok' },
+              { id: 'chws', name: 'CHWS', kind: 'equipment', status: 'ok' },
             ],
           },
           { id: 'second-floor', name: 'Second Floor', kind: 'floor' },
           { id: 'third-floor', name: 'Third Floor', kind: 'floor' },
         ],
       },
-      { id: 'south-office', name: 'South Office', kind: 'building' },
+      { id: 'south-office', name: 'South Office', kind: 'building', status: 'alarm' },
       { id: 'east-office', name: 'East Office', kind: 'building' },
-      { id: 'warehouse', name: 'Warehouse', kind: 'building' },
+      { id: 'warehouse', name: 'Warehouse', kind: 'building', status: 'ok' },
     ],
   },
 ]

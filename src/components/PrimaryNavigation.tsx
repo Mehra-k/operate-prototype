@@ -15,17 +15,19 @@ import {
 type NavigationItem = {
   label: string
   icon: LucideIcon
+  badge?: number
 }
 
 type PrimaryNavigationProps = {
   activeItem: string
   onSelect: (label: string) => void
+  alarmCount?: number
 }
 
-const primaryItems: NavigationItem[] = [
+const getPrimaryItems = (alarmCount?: number): NavigationItem[] => [
   { label: 'Home', icon: House },
   { label: 'Equipment', icon: Building2 },
-  { label: 'Alarms & Faults', icon: Bell },
+  { label: 'Alarms & Faults', icon: Bell, badge: alarmCount },
   { label: 'Schedules', icon: CalendarDays },
   { label: 'Command Center', icon: Network },
   { label: 'Reports', icon: FileText },
@@ -58,6 +60,11 @@ function NavigationButton({
     >
       <Icon size={16} strokeWidth={2} aria-hidden="true" />
       <span>{item.label}</span>
+      {item.badge && item.badge > 0 && (
+        <span className="primary-navigation__badge" aria-label={`${item.badge} active alarm${item.badge > 1 ? 's' : ''}`}>
+          {item.badge}
+        </span>
+      )}
     </button>
   )
 }
@@ -65,7 +72,10 @@ function NavigationButton({
 export function PrimaryNavigation({
   activeItem,
   onSelect,
+  alarmCount,
 }: PrimaryNavigationProps) {
+  const primaryItems = getPrimaryItems(alarmCount)
+
   return (
     <nav className="primary-navigation" aria-label="Primary navigation">
       <div className="primary-navigation__main">

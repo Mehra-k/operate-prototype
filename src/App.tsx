@@ -148,6 +148,7 @@ export default function App() {
         <PrimaryNavigation
           activeItem={activeNavigation}
           onSelect={navigatePrimaryNavigation}
+          alarmCount={operateOverviewData.activeAlarmCount}
         />
         <EquipmentHierarchy
           nodes={equipmentHierarchy}
