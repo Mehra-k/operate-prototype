@@ -473,6 +473,13 @@ body {
   padding: 10px 12px 16px;
 }
 
+.equipment-page__bottom-spacer {
+  height: 50px;
+  min-height: 50px;
+  flex-shrink: 0;
+  background: white;
+}
+
 .operate-overview-container {
   display: grid;
   grid-template-columns: minmax(0, 2.65fr) minmax(240px, 1fr);
@@ -1030,12 +1037,13 @@ button.operational-rollup__item:hover {
 
 .operational-rollup__label {
   color: #454a50;
-  font-size: 8px;
+  font-size: 9px;
+  font-weight: 700;
 }
 
 .operational-rollup__count {
   color: #25292e;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -1058,7 +1066,7 @@ button.operational-rollup__item:hover {
 .operational-rollup__percentage {
   grid-column: 2;
   color: #5e6369;
-  font-size: 8px;
+  font-size: 9px;
   text-align: right;
 }
 
@@ -1070,7 +1078,7 @@ button.operational-rollup__item:hover {
   align-items: center;
   gap: 4px;
   color: #5e6369;
-  font-size: 7px;
+  font-size: 8px;
   line-height: 1.3;
 }
 
@@ -1344,7 +1352,7 @@ button.operational-rollup__item:hover {
   justify-content: space-between;
   gap: 4px;
   color: #30343a;
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 650;
 }
 
@@ -1368,12 +1376,12 @@ button.operational-rollup__item:hover {
 }
 
 .key-point-card__reading > span {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
 }
 
 .key-point-card__reading small {
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 600;
 }
 
@@ -1402,7 +1410,7 @@ button.operational-rollup__item:hover {
   align-items: center;
   gap: 5px;
   color: #555b61;
-  font-size: 7px;
+  font-size: 8px;
   line-height: 1.2;
 }
 
@@ -3893,6 +3901,7 @@ input:focus-visible {
 
   .operational-rollup__label {
     font-size: 8px;
+    font-weight: 700;
   }
 
   .operational-rollup__count {

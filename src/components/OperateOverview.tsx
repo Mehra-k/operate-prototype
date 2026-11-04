@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react'
+import { ChevronDown } from 'lucide-react'
 import {
   ControllingDevicesCard,
   EquipmentPropertiesCard,
@@ -62,6 +63,7 @@ export function OperateOverview({
               type="button"
               aria-label="Open Notes panel"
             >
+              <ChevronDown size={16} aria-hidden="true" />
               Notes
             </button>
           )}

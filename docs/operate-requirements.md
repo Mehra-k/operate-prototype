@@ -426,25 +426,37 @@ The following features are **out of scope** for the current prototype and should
    - "Connected" for controller status
    - "Program/Sequence" for program/sequence name field
 8. Attempted Related Equipment connector line fix (reverted due to layout break)
-9. Added collapsible Notes panel:
+9. Added collapsible Notes panel with improved arrow directionality:
    - Notes column is visible by default on desktop as the right-side column of the Overview area
-   - Users can collapse Notes using a ChevronLeft icon in the Notes header
+   - Users can collapse Notes using a **ChevronUp (↑)** icon in the Notes header
    - When collapsed, the main Operate content expands to full available width
    - No empty Notes column remains when collapsed
    - Existing card hierarchy and proportions are preserved during expansion
    - Notes state and content are preserved during collapse/reopen
-   - When Notes is collapsed, a "Notes" reopen button appears on the same row as the "Overview" heading
+   - When Notes is collapsed, a "Notes" reopen button with a **ChevronDown (↓)** icon appears on the same row as the "Overview" heading
    - The Notes reopen button is aligned to the far right of the Overview heading row
    - The Notes reopen button does NOT appear beside Active Alarms or at the bottom of the page
    - The Notes reopen button remains accessible without requiring scroll
    - Clicking the Notes button restores the Notes right-side column
    - The Overview-level Notes button disappears when Notes is open
    - Original layout is restored when Notes is reopened
-10. Finalized documentation and verified all features
+   - Arrow direction clearly communicates the action (UP arrow indicates collapse/hide, DOWN arrow indicates open/show)
+10. Improved typography in Operational Roll-up cards:
+   - Status titles (Healthy, In Alarm, In Override) are now **bold text**
+   - Bold text combined with EF status colors (green, red, purple) improves status identification
+   - Color alone is no longer the only visual distinction for status
+   - Main values (e.g., 11 / 14, 2 / 14, 1 / 14) remain visually dominant
+   - Trend information and visual hierarchy are preserved
+   - Key Points typography refined for improved readability throughout
+11. Added page bottom breathing room:
+   - Approximately 50px of white space appears below the final page content
+   - Provides visual spacing at the end of the scrollable area
+   - Improves user experience with clean page ending
+12. Finalized documentation and verified all features
 
 **Not Modified (Preserved from Earlier Work):**
 - Overview card layout and content
-- Related Equipment diagram hierarchy
+- Related Equipment diagram hierarchy (approved as-is with known connector geometry refinement needed)
 - Point Details view
 - Trends tab core functionality
 - Associated Documents tab

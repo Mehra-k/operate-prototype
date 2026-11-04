@@ -68,6 +68,7 @@ export function EquipmentPage({
           aria-label={`${activeTab} content`}
         >
           {children}
+          <div className="equipment-page__bottom-spacer" aria-hidden="true" />
         </section>
       </div>
     </main>

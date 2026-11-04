@@ -105,8 +105,8 @@ export function RelatedEquipment({
             preserveAspectRatio="none"
             aria-hidden="true"
           >
-            <path d="M500 43V58H350V70M500 58H650V70" />
-            <path d="M650 120V154H370M650 154H930M370 154V174M510 154V174M650 154V174M790 154V174M930 154V174" />
+            <path d="M500 43V86H350V101M500 86H650V101" />
+            <path d="M650 120V214H370M650 214H930M370 214V234M510 214V234M650 214V234M790 214V234M930 214V234" />
           </svg>
           <div className="related-equipment__upstream">
             <EquipmentNode

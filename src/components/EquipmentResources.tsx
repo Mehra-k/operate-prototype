@@ -2,7 +2,7 @@ import { useRef, useState, type Dispatch, type FormEvent, type ReactNode, type S
 import {
   Archive,
   Check,
-  ChevronLeft,
+  ChevronUp,
   Download,
   FileSpreadsheet,
   FileText,
@@ -81,7 +81,7 @@ function NotesPanel({ notes, onNotesChange: setNotes, onToggleNotes }: Equipment
             type="button"
             title="Collapse Notes"
           >
-            <ChevronLeft size={20} aria-hidden="true" />
+            <ChevronUp size={20} aria-hidden="true" />
           </button>
         )}
       </header>
