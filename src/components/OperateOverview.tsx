@@ -86,7 +86,7 @@ export function OperateOverview({
         />
         {currentEquipmentId === 'ahu-sa-01' && (
           <Suspense fallback={<div className="overview-point-trend__loading" aria-label="Loading Point Trend" />}>
-            <PointTrendPanel state={pointTrendState} onStateChange={onPointTrendStateChange} onViewPoint={onViewPointDetails} />
+            <PointTrendPanel state={pointTrendState} onStateChange={onPointTrendStateChange} />
           </Suspense>
         )}
         {relatedEquipmentVisible && (
