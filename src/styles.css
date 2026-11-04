@@ -4964,29 +4964,30 @@ input:focus-visible {
 }
 
 .wider-site-tree {
-  font-size: 13px;
-  color: #5f6368;
+  font-size: 12px;
+  color: #2f3338;
 }
 
 .wider-site-tree-node {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 8px;
+  gap: 4px;
+  min-height: 22px;
+  padding: 1px 4px;
 }
 
 .wider-site-tree-toggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 14px;
-  height: 14px;
+  width: 15px;
+  height: 20px;
   padding: 0;
   border: none;
-  background: none;
+  background: transparent;
   cursor: pointer;
-  color: #5f6368;
-  flex-shrink: 0;
+  color: #34383d;
+  flex: 0 0 15px;
   transition: color 0.2s ease;
 }
 
@@ -4997,51 +4998,66 @@ input:focus-visible {
 .wider-site-tree-equipment-label {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 4px;
+  gap: 5px;
+  padding: 0 2px;
   margin: 0;
   cursor: pointer;
   border-radius: 2px;
   transition: background-color 0.15s ease;
+  font-size: 12px;
+  min-height: 20px;
   flex: 1;
+  min-width: 0;
 }
 
 .wider-site-tree-equipment-label:hover {
-  background-color: #f8f9fa;
+  background-color: #f0f0f0;
 }
 
 .wider-site-tree-equipment-label input[type="checkbox"] {
   margin: 0;
   cursor: pointer;
-  flex-shrink: 0;
+  flex: 0 0 auto;
 }
 
 .wider-site-tree-equipment {
-  padding: 0 4px;
+  padding: 0 2px;
   border: none;
   background: transparent;
-  color: #202124;
+  color: #2f3338;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 400;
   text-align: left;
   border-radius: 0;
   transition: background-color 0.15s ease;
   font: inherit;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .wider-site-tree-group {
-  padding: 6px 4px;
+  display: flex;
+  align-items: center;
+  padding: 0 2px;
   margin: 0;
   border: none;
   background: transparent;
-  color: #202124;
-  font-weight: 500;
+  color: #2f3338;
+  font-weight: 400;
   text-align: left;
   border-radius: 2px;
   cursor: pointer;
   font: inherit;
+  font-size: 12px;
   transition: background-color 0.15s ease;
   flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 21px;
 }
 
 .wider-site-tree-group:hover {

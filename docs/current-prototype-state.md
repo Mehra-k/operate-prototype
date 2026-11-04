@@ -95,9 +95,102 @@ OK/Normal/Healthy/Connected and resolved-note indicators use OK. Alarm point nam
 - Notes permissions, production state-configuration policy, and deployment/sharing are not implemented. The GitHub repository is private, but there is no shared hosted deployment; localhost is accessible only on the developer machine. Private source alone must not be treated as private website access control.
 - Preserve Graphics, historical playback, automated diagnostic warnings, real permissions, and integrations as future/unresolved concepts in the requirements, not implemented features.
 
+## Point Trend – Operate Tab (November 4, 2026 Refactoring)
+
+### Current Implementation
+
+The **Point Trend – Duct Static Pressure** card under the Operate tab has been refactored into a unified **TrendWorkspace** component that renders identically in both inline and expanded-modal views with shared state.
+
+**Layout and Controls:**
+- **Header:** "Point Trend – Duct Static Pressure" title with two top-right buttons: Expand (icon) and Reset (text)
+- **Time Range:** Compact dropdown selector (24h default) positioned below the title, right-aligned
+- **Chart:** Recharts CartesianChart with event markers, series visibility/focus/scale controls, and tooltip/hover interactions
+- **Trend View Row:** 
+  - Labeled section showing "Trend View"
+  - Dropdown selector (340px width on desktop) displaying current trend (e.g., "Point Trend – Duct Static Pressure")
+  - "+ Create custom trend" button (Phase 2 only, hidden in Phase 1)
+- **Add Point From Workflow:**
+  - Labeled section showing "Add point from"
+  - Three source options: This equipment, Related equipment, Wider site
+  - Each source has equipment/point selection controls and "+ Add point" button
+  - Selections are enabled/disabled based on availability and user selection state
+- **Selected Points Chips:** Horizontal list of added-point chips, each with name/id and × delete button
+- **Shared State:** Inline card and expanded modal use identical state objects from parent PointTrendPanel; changes in one view immediately reflect in the other
+
+### "Add Point From" Sources
+
+**THIS EQUIPMENT**
+- Uses the current equipment (e.g., AHU-SA-01)
+- User clicks "Select point" dropdown
+- Available points from current equipment are listed
+- User selects a point
+- User clicks "+ Add point"
+- Chart series updates immediately
+- Point appears in Selected Points list
+
+**RELATED EQUIPMENT**
+- User clicks "Select equipment" dropdown
+- Related equipment list is displayed (Chiller CH-01, AHU-SA-02, VAV-01–04, etc.)
+- User selects an equipment
+- User clicks "Select point" dropdown
+- Available points for that equipment are listed
+- User selects a point
+- User clicks "+ Add point"
+- Chart series updates
+- Allows multi-equipment trend comparison
+
+**WIDER SITE**
+- User clicks "Select equipment" dropdown
+- Hierarchical equipment picker displays inside dropdown/popover:
+  - Location/site group nodes (Riverside Complex, Tower A, Floor 1, etc.) expand/collapse via chevrons
+  - Equipment leaf nodes (AHU-SA-01, VAV-01, etc.) have checkboxes for multi-selection
+  - No checkboxes on group nodes; group rows are navigation-only
+- User may select multiple equipment via checkboxes
+- User clicks "Select point" dropdown
+- Available points that apply to ALL selected equipment are listed
+- User selects a point
+- User clicks "+ Add point"
+- Chart series updates with multi-equipment series
+- Supports site-wide equipment comparison
+
+### Expanded Point Trend Modal
+
+- **Trigger:** Expand button on inline Point Trend
+- **Rendering:** Pure React conditional rendering (not native dialog element)
+- **Backdrop:** Semi-transparent overlay, clickable to close
+- **Modal Content:** Same TrendWorkspace with identical state, larger viewport for chart visibility
+- **Header:** Title + Reset button + X close button
+- **Close Behavior:** 
+  - X button closes modal
+  - Escape key closes modal
+  - Focus returns to Expand button after close
+  - Backdrop click closes modal
+- **State Persistence:** Changes made in expanded modal immediately appear in inline view when modal closes
+
+### Removed Point Trend Controls
+
+The Operate Point Trend no longer includes:
+- **Three-dot menu:** Removed; controls now inline
+- **Duplicate Trend:** No longer available; use Create Custom Trend instead
+- **Old Series dropdown:** Replaced by Add Point From workflow
+- **View Point action:** Point navigation through point-detail panel; use main Point Details instead
+- **Persistent custom-trend saving:** Custom trends are session-only; not saved to backend
+- **Rename Trend:** Can be implemented in future if needed
+
+### Custom Trend Behavior (Temporary/Session-Only)
+
+- User can click "+ Create custom trend" button (Phase 2 only)
+- A custom trend is created as "Custom Trend" with empty series
+- User adds points via "Add point from" workflow
+- Custom trend state persists while the Operate tab is active
+- Switching tabs or reloading the page clears custom trends
+- No backend persistence or storage
+
 ## Known Issues
 
 - **Related Equipment connector lines:** Related Equipment connector lines are functional and successfully visualize the equipment hierarchy. However, some connector geometry/alignment still needs visual refinement—for example, some vertical lines do not align perfectly with card boundaries. The diagram layout, structure, node positions, and interaction model are approved and stable. Do not redesign the diagram or rebuild the connector architecture without an explicit request. Any future refinement must preserve the existing layout.
+
+- **Wider Site equipment-tree visual styling:** Wider Site tree currently requires visual refinement. Parent/location nodes (Riverside Complex, Tower A, Floor 1, Second Floor, Third Floor, South Office, East Office, Warehouse) should be rendered as compact navigation-tree rows rather than bordered form-control-like elements. Location/group nodes should use clear ChevronRight (collapsed) / ChevronDown (expanded) treatment without checkboxes. Equipment leaf nodes should use checkboxes for selection. Tree indentation should clearly communicate hierarchy depth (0px, 16px, 32px, 48px). Current styling overrides applied; additional visual refinement may be needed in future iterations. Do not redesign the hierarchy or invent missing equipment without an explicit request. The tree uses only existing equipment data from `src/data/equipment.ts`.
 
 ## Run, Build, and Git
 
