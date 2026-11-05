@@ -4,7 +4,7 @@ import { EquipmentPage, type EquipmentTab } from './components/EquipmentPage.tsx
 import { DocumentsPanel } from './components/EquipmentResources.tsx'
 import { ActiveAlarmSummary } from './components/ActiveAlarmSummary.tsx'
 import { PointDetails } from './components/PointDetails.tsx'
-import { PointDirectory } from './components/PointDirectory.tsx'
+import { PointsTable } from './components/PointsTable.tsx'
 import { OperateHeader } from './components/OperateHeader.tsx'
 import { OperateOverview } from './components/OperateOverview.tsx'
 import { FilteredPoints } from './components/FilteredPoints.tsx'
@@ -113,12 +113,6 @@ export default function App() {
     }
   }
 
-  function showAllPoints() {
-    setSelectedPointId(null)
-    setPointsFilter(null)
-    setActiveTab('Points')
-  }
-
   function returnToEquipment() {
     setSelectedPointId(null)
     setPointsFilter(pointReturnContext?.pointsFilter ?? null)
@@ -167,7 +161,6 @@ export default function App() {
             <OperateOverview
               onViewDevice={() => setActiveNavigation('Command Center')}
               onFilterPoints={showFilteredPoints}
-              onViewAllPoints={showAllPoints}
               onViewPointDetails={openPointDetails}
               currentEquipmentId={selectedNodeId}
               relatedEquipmentVisible={relatedEquipmentIds.has(selectedNodeId)}
@@ -194,7 +187,7 @@ export default function App() {
             <FilteredPoints filter={pointsFilter} />
           )}
           {activeTab === 'Points' && !selectedPoint && !pointsFilter && (
-            <PointDirectory onSelectPoint={openPointDetails} />
+            <PointsTable onSelectPoint={openPointDetails} />
           )}
           {activeTab === 'Equipment Graphic' && (
             <EquipmentGraphic />

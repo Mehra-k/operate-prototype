@@ -579,31 +579,42 @@ export function TrendWorkspace({
 
       {/* Two-column lower controls */}
       <div className="overview-point-trend__lower-controls">
-        {/* Left column: Trend View only */}
+        {/* Left column: Trend View with Create Custom Trend button */}
         <div className="overview-point-trend__lower-column overview-point-trend__lower-column--left">
           <h3 className="overview-point-trend__section-title">Trend View</h3>
-          <select
-            value={customTrendState.isActive ? 'custom' : activeView.id}
-            onChange={(event) => {
-              if (event.target.value === 'custom') {
-                toggleCustomTrendMode()
-              } else {
-                selectView(event.target.value)
-              }
-            }}
-            aria-label="Select trend view"
-            className="overview-point-trend__trend-view-select"
-          >
-            <optgroup label="Pre-built trends">
-              {state.views
-                .filter((view) => !view.custom)
-                .map((view) => (
-                  <option value={view.id} key={view.id}>
-                    {view.name}
-                  </option>
-                ))}
-            </optgroup>
-          </select>
+          <div className="overview-point-trend__trend-view-row">
+            <select
+              value={customTrendState.isActive ? 'custom' : activeView.id}
+              onChange={(event) => {
+                if (event.target.value === 'custom') {
+                  toggleCustomTrendMode()
+                } else {
+                  selectView(event.target.value)
+                }
+              }}
+              aria-label="Select trend view"
+              className="overview-point-trend__trend-view-select"
+            >
+              <optgroup label="Pre-built trends">
+                {state.views
+                  .filter((view) => !view.custom)
+                  .map((view) => (
+                    <option value={view.id} key={view.id}>
+                      {view.name}
+                    </option>
+                  ))}
+              </optgroup>
+            </select>
+            <button
+              type="button"
+              onClick={toggleCustomTrendMode}
+              className="overview-point-trend__create-custom-btn"
+              aria-label="Create custom trend"
+            >
+              <Plus size={16} aria-hidden="true" />
+              Create custom trend
+            </button>
+          </div>
         </div>
 
         {/* Right column: Create Custom Trend section and Add Point From (when in custom mode) */}

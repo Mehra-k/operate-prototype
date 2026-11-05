@@ -1,7 +1,6 @@
 import { useRef, useState, type Dispatch, type FormEvent, type ReactNode, type SetStateAction } from 'react'
 import {
   Archive,
-  Check,
   ChevronUp,
   Download,
   FileSpreadsheet,
@@ -52,18 +51,12 @@ function NotesPanel({ notes, onNotesChange: setNotes, onToggleNotes }: Equipment
         date,
         time,
         datetime: createdAt.toISOString(),
-        resolved: false,
       },
       ...current,
     ])
     setDraft('')
   }
 
-  function markResolved(noteId: string) {
-    setNotes((current) => current.map((note) =>
-      note.id === noteId ? { ...note, resolved: true } : note,
-    ))
-  }
 
   function deleteNote(noteId: string) {
     setNotes((current) => current.filter((note) => note.id !== noteId))
@@ -108,7 +101,6 @@ function NotesPanel({ notes, onNotesChange: setNotes, onToggleNotes }: Equipment
           <NoteItem
             key={note.id}
             note={note}
-            onResolve={markResolved}
             onDelete={deleteNote}
           />
         ))}
@@ -119,11 +111,9 @@ function NotesPanel({ notes, onNotesChange: setNotes, onToggleNotes }: Equipment
 
 function NoteItem({
   note,
-  onResolve,
   onDelete,
 }: {
   note: EquipmentNote
-  onResolve: (noteId: string) => void
   onDelete: (noteId: string) => void
 }) {
   const initials = note.author
@@ -133,27 +123,16 @@ function NoteItem({
     .slice(0, 2)
 
   return (
-    <article className={`notes-panel__note${note.resolved ? ' is-resolved' : ''}`}>
+    <article className="notes-panel__note">
       <div className="notes-panel__avatar" aria-hidden="true">{initials}</div>
       <div className="notes-panel__note-body">
         <div className="notes-panel__note-meta">
           <strong>{note.author}</strong>
           <time dateTime={note.datetime}>{note.date}, {note.time}</time>
-          {note.resolved && <span className="notes-panel__resolved-label">Resolved</span>}
         </div>
         <p>{note.content}</p>
       </div>
       <div className="notes-panel__note-actions">
-        {!note.resolved && (
-          <button
-            type="button"
-            aria-label={`Resolve note by ${note.author}`}
-            title="Resolve note"
-            onClick={() => onResolve(note.id)}
-          >
-            <Check size={12} aria-hidden="true" />
-          </button>
-        )}
         <button
           type="button"
           aria-label={`Delete note by ${note.author}`}

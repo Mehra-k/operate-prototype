@@ -17,7 +17,6 @@ const PointTrendPanel = lazy(() => import('./PointTrendPanel.tsx'))
 type OperateOverviewProps = EquipmentNotesProps & {
   onViewDevice: (deviceId: string) => void
   onFilterPoints: (filter: PointFilter) => void
-  onViewAllPoints: () => void
   onViewPointDetails: (pointId: string) => void
   onViewDocuments: () => void
   currentEquipmentId: string
@@ -34,7 +33,6 @@ type OperateOverviewProps = EquipmentNotesProps & {
 export function OperateOverview({
   onViewDevice,
   onFilterPoints,
-  onViewAllPoints,
   onViewPointDetails,
   currentEquipmentId,
   relatedEquipmentVisible,
@@ -76,12 +74,11 @@ export function OperateOverview({
         </nav>
         <div className="operate-overview__cards">
           <EquipmentPropertiesCard />
-          <ControllingDevicesCard onViewDevice={onViewDevice} />
           <EquipmentStateCard />
+          <ControllingDevicesCard onViewDevice={onViewDevice} />
         </div>
         <OperationalRollup onFilterPoints={onFilterPoints} />
         <KeyPointsSection
-          onViewAllPoints={onViewAllPoints}
           onSelectPoint={onViewPointDetails}
         />
         {currentEquipmentId === 'ahu-sa-01' && (

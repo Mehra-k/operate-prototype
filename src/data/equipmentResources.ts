@@ -5,7 +5,6 @@ export type EquipmentNote = {
   date: string
   time: string
   datetime: string
-  resolved: boolean
 }
 
 export type EquipmentDocument = {
@@ -29,7 +28,6 @@ export const initialEquipmentNotes: EquipmentNote[] = [
     date: 'Oct 27, 2026',
     time: '4:21 PM',
     datetime: '2026-10-27T16:21:00',
-    resolved: false,
   },
   {
     id: 'filter-maintenance',
@@ -38,7 +36,6 @@ export const initialEquipmentNotes: EquipmentNote[] = [
     date: 'Oct 26, 2026',
     time: '10:15 AM',
     datetime: '2026-10-26T10:15:00',
-    resolved: false,
   },
   {
     id: 'pressure-recurring',
@@ -47,7 +44,6 @@ export const initialEquipmentNotes: EquipmentNote[] = [
     date: 'Oct 20, 2026',
     time: '9:03 AM',
     datetime: '2026-10-20T09:03:00',
-    resolved: false,
   },
 ]
 

@@ -107,6 +107,84 @@ function RollupPopover({ statusKey }: { statusKey: string }) {
     )
   }
 
+  if (statusKey === 'down') {
+    const downPoints = keyPoints.filter((p) => p.state === 'Down')
+    if (downPoints.length === 0) return null
+
+    return (
+      <div className="operational-rollup__popover">
+        <div className="operational-rollup__popover-header">
+          Down • {downPoints.length} point
+        </div>
+        <div className="operational-rollup__popover-content">
+          {downPoints.map((point) => (
+            <div key={point.id} className="operational-rollup__popover-item">
+              <span className="operational-rollup__popover-name">{point.pointName}</span>
+              <span className="operational-rollup__popover-value">
+                Communication lost
+              </span>
+              <span className="operational-rollup__popover-detail">
+                Last communication: {point.updated}
+              </span>
+            </div>
+          ))}
+          <div className="operational-rollup__popover-summary">
+            Communications failure
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (statusKey === 'fault') {
+    const faultPoints = keyPoints.filter((p) => p.state === 'Fault')
+    if (faultPoints.length === 0) return null
+
+    return (
+      <div className="operational-rollup__popover">
+        <div className="operational-rollup__popover-header">
+          Fault • {faultPoints.length} point
+        </div>
+        <div className="operational-rollup__popover-content">
+          {faultPoints.map((point) => (
+            <div key={point.id} className="operational-rollup__popover-item">
+              <span className="operational-rollup__popover-name">{point.pointName}</span>
+              <span className="operational-rollup__popover-value">
+                {point.value} {point.unit}
+              </span>
+            </div>
+          ))}
+          <div className="operational-rollup__popover-summary">
+            Sensor fault detected
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (statusKey === 'out-of-service') {
+    const oosPoints = keyPoints.filter((p) => p.state === 'Out of Service')
+    if (oosPoints.length === 0) return null
+
+    return (
+      <div className="operational-rollup__popover">
+        <div className="operational-rollup__popover-header">
+          Out of Service • {oosPoints.length} points
+        </div>
+        <div className="operational-rollup__popover-content">
+          {oosPoints.map((point) => (
+            <div key={point.id} className="operational-rollup__popover-item">
+              <span className="operational-rollup__popover-name">{point.pointName}</span>
+              <span className="operational-rollup__popover-value">
+                Out of Service
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
   return null
 }
 
@@ -118,7 +196,7 @@ function RollupItem({
   onFilterPoints: (filter: PointFilter) => void
 }) {
   const [isHovering, setIsHovering] = useState(false)
-  const shouldShowPopover = ['alarm', 'override', 'healthy'].includes(status.key)
+  const shouldShowPopover = ['alarm', 'override', 'healthy', 'down', 'fault', 'out-of-service'].includes(status.key)
 
   if (status.filter) {
     return (

@@ -36,10 +36,11 @@ export type KeyPoint = {
   pointName: string
   value: string
   unit: string
-  state: 'Normal' | 'Low' | 'High' | 'Override'
+  type?: string
+  state: 'Normal' | 'Low' | 'High' | 'Override' | 'Down' | 'Fault' | 'Out of Service'
   setpoint?: string
   updated: string
-  trend: 'up' | 'down'
+  trend: 'up' | 'down' | 'flat'
 }
 
 export const operateOverviewData = {
@@ -90,7 +91,7 @@ export const operateOverviewData = {
   ] satisfies EquipmentStateValue[],
   operationalRollup: [
     {
-      key: 'healthy', label: 'Healthy', count: 11, total: 14,
+      key: 'healthy', label: 'Healthy', count: 7, total: 14,
       trend: { label: 'Stable', change: '+0 delta', direction: 'flat' },
     },
     {
@@ -101,11 +102,24 @@ export const operateOverviewData = {
       key: 'override', label: 'In Override', count: 1, total: 14, filter: 'override',
       trend: { label: 'Flat', change: '0 changed', direction: 'flat' },
     },
+    {
+      key: 'down', label: 'Down', count: 1, total: 14,
+      trend: { label: 'Stable', change: '+0 changes', direction: 'flat' },
+    },
+    {
+      key: 'fault', label: 'Fault', count: 1, total: 14,
+      trend: { label: 'Stable', change: '+0 changes', direction: 'flat' },
+    },
+    {
+      key: 'out-of-service', label: 'Out of Service', count: 2, total: 14,
+      trend: { label: 'Stable', change: '+0 changes', direction: 'flat' },
+    },
   ],
   keyPoints: [
     {
       id: 'zone-temp',
       pointName: 'Zone Temp',
+      type: 'AI',
       value: '72.4',
       unit: '°F',
       state: 'Normal',
@@ -116,6 +130,7 @@ export const operateOverviewData = {
     {
       id: 'supply-air-temp',
       pointName: 'Supply Air Temp',
+      type: 'AI',
       value: '55.3',
       unit: '°F',
       state: 'Normal',
@@ -126,6 +141,7 @@ export const operateOverviewData = {
     {
       id: 'duct-static-pressure',
       pointName: 'Duct Static Pressure',
+      type: 'AI',
       value: '1.2',
       unit: 'in wc',
       state: 'Low',
@@ -136,6 +152,7 @@ export const operateOverviewData = {
     {
       id: 'supply-fan-speed',
       pointName: 'Supply Fan Speed',
+      type: 'AO',
       value: '78',
       unit: '%',
       state: 'Override',
@@ -146,6 +163,7 @@ export const operateOverviewData = {
     {
       id: 'co2',
       pointName: 'CO2',
+      type: 'AI',
       value: '1,180',
       unit: 'ppm',
       state: 'High',
@@ -156,6 +174,7 @@ export const operateOverviewData = {
     {
       id: 'outdoor-air-damper',
       pointName: 'Outdoor Air Damper',
+      type: 'AI',
       value: '25',
       unit: '%',
       state: 'Normal',
@@ -165,6 +184,7 @@ export const operateOverviewData = {
     {
       id: 'return-air-temp',
       pointName: 'Return Air Temp',
+      type: 'AI',
       value: '71.2',
       unit: '°F',
       state: 'Normal',
@@ -174,11 +194,52 @@ export const operateOverviewData = {
     {
       id: 'mixed-air-temp',
       pointName: 'Mixed Air Temp',
+      type: 'AI',
       value: '62.1',
       unit: '°F',
       state: 'Normal',
       updated: '2 min ago',
       trend: 'up',
+    },
+    {
+      id: 'supply-fan-speed-down',
+      pointName: 'Supply Fan Speed',
+      type: 'AO',
+      value: '—',
+      unit: '',
+      state: 'Down',
+      updated: '12 min ago',
+      trend: 'down',
+    },
+    {
+      id: 'supply-air-temp-fault',
+      pointName: 'Supply Air Temperature',
+      type: 'AI',
+      value: '55.3',
+      unit: '°F',
+      state: 'Fault',
+      updated: '2 min ago',
+      trend: 'down',
+    },
+    {
+      id: 'reheat-oos',
+      pointName: 'Reheat',
+      type: 'B0',
+      value: 'Out of Service',
+      unit: '',
+      state: 'Out of Service',
+      updated: '12 hours ago',
+      trend: 'flat',
+    },
+    {
+      id: 'discharge-air-temp-oos',
+      pointName: 'Discharge Air Temperature',
+      type: 'AI',
+      value: 'Out of Service',
+      unit: '',
+      state: 'Out of Service',
+      updated: '12 hours ago',
+      trend: 'flat',
     },
   ] satisfies KeyPoint[],
 }

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Bell, ArrowRight, CheckCircle2, ChevronRight, CircleX, ArrowDown, ArrowUp } from 'lucide-react'
+import { Bell, ArrowRight, CheckCircle2, ChevronRight, CircleX, ArrowDown, ArrowUp, ChevronUp, ChevronDown } from 'lucide-react'
 import {
   formatPointValue,
   getKeyPoint,
@@ -15,11 +15,23 @@ export function ActiveAlarmSummary({
   onViewPoint,
   onViewAllAlarms,
 }: ActiveAlarmSummaryProps) {
-  const { activeAlarmCount, alarmDescription, activeAlarms } = operateOverviewData
+  const { activeAlarmCount, activeAlarms } = operateOverviewData
+  const [isExpanded, setIsExpanded] = useState(true)
 
   return (
     <section className="active-alarm-summary" aria-labelledby="active-alarms-heading">
-      <header className="active-alarm-summary__header">
+      <header
+        className="active-alarm-summary__header"
+        role="button"
+        tabIndex={0}
+        onClick={() => setIsExpanded(!isExpanded)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            setIsExpanded(!isExpanded)
+          }
+        }}
+      >
         <Bell
           className="active-alarm-summary__icon"
           size={18}
@@ -27,32 +39,64 @@ export function ActiveAlarmSummary({
           aria-hidden="true"
         />
         <div className="active-alarm-summary__heading-copy">
-          <h2 id="active-alarms-heading">{activeAlarmCount} Active Alarms</h2>
-          <p>{alarmDescription}</p>
+          <h2 id="active-alarms-heading">Active Alarms and Faults</h2>
+          <p>
+            These 2 points have{' '}
+            <strong className="active-alarm-summary__emphasis">2 active alarms</strong>{' '}
+            that require attention.
+          </p>
         </div>
         <button
           className="active-alarm-summary__all-action"
           type="button"
-          onClick={onViewAllAlarms}
+          onClick={(e) => {
+            e.stopPropagation()
+            onViewAllAlarms()
+          }}
+          aria-label={`View all ${activeAlarmCount} alarms`}
         >
           View all alarms ({activeAlarmCount})
           <ArrowRight size={13} aria-hidden="true" />
         </button>
+        <button
+          className="active-alarm-summary__toggle"
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            setIsExpanded(!isExpanded)
+          }}
+          aria-expanded={isExpanded}
+          aria-label={isExpanded ? 'Collapse alarms' : 'Expand alarms'}
+          aria-controls="active-alarms-table"
+        >
+          {isExpanded ? (
+            <ChevronUp size={16} aria-hidden="true" />
+          ) : (
+            <ChevronDown size={16} aria-hidden="true" />
+          )}
+        </button>
       </header>
-      <div className="active-alarm-summary__table" role="table" aria-label="Active alarms">
-        <div className="active-alarm-summary__columns" role="row">
-          <span role="columnheader">Point</span>
-          <span role="columnheader">Alarm Message</span>
-          <span role="columnheader">Acknowledge</span>
-          <span role="columnheader">Clear</span>
-          <span role="columnheader">Current Value</span>
-          <span role="columnheader">Time in Alarm</span>
-          <span role="columnheader">Action</span>
+      {isExpanded && (
+        <div
+          className="active-alarm-summary__table"
+          id="active-alarms-table"
+          role="table"
+          aria-label="Active alarms"
+        >
+          <div className="active-alarm-summary__columns" role="row">
+            <span role="columnheader">Point</span>
+            <span role="columnheader">Alarm Message</span>
+            <span role="columnheader">Acknowledge</span>
+            <span role="columnheader">Clear</span>
+            <span role="columnheader">Current Value</span>
+            <span role="columnheader">Time in Alarm</span>
+            <span role="columnheader">Action</span>
+          </div>
+          {activeAlarms.map((alarm) => (
+            <AlarmRow alarm={alarm} onViewPoint={onViewPoint} key={alarm.id} />
+          ))}
         </div>
-        {activeAlarms.map((alarm) => (
-          <AlarmRow alarm={alarm} onViewPoint={onViewPoint} key={alarm.id} />
-        ))}
-      </div>
+      )}
     </section>
   )
 }
