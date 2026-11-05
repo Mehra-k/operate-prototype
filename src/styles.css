@@ -1512,6 +1512,10 @@ button.operational-rollup__item:hover {
   gap: 12px;
 }
 
+.key-points__header {
+  padding-bottom: 20px;
+}
+
 .key-points__header h2,
 .point-directory__header h2 {
   margin: 0;
