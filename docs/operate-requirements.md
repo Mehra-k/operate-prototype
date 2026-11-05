@@ -452,16 +452,29 @@ The following features are **out of scope** for the current prototype and should
    - Approximately 50px of white space appears below the final page content
    - Provides visual spacing at the end of the scrollable area
    - Improves user experience with clean page ending
-12. Finalized documentation and verified all features
+12. Point Trend layout refinement (November 4, 2026):
+   - Below the chart, restructured lower controls into two-column layout
+   - LEFT column: "Trend View" with dropdown selector only (removed "+ Create custom trend" button)
+   - RIGHT column: "Create Custom Trend" heading + "Add Point From" section with selection controls
+   - All dropdown/button controls use consistent 28px height
+   - Responsive: desktop 50/50 split, tablet maintained, mobile stacked vertically
+   - Typography: Consistent 11px base font size; primary headings use 600 weight, secondary headings use 500 weight
+   - Selected-series chips remain in right column below Add Point controls
+13. Tab navigation restructuring (November 5, 2026):
+   - Removed "Trends" tab from equipment-page navigation
+   - Added "Equipment Graphic" tab between Operate and Points
+   - Final tab order: Operate | Equipment Graphic | Points | Associated Documents
+   - Trend functionality fully preserved in Operate tab (Point Trend card with all features)
+   - Equipment Graphic displays static AHU equipment schematic placeholder (non-interactive)
+14. Finalized documentation and verified all features
 
 **Not Modified (Preserved from Earlier Work):**
 - Overview card layout and content
 - Related Equipment diagram hierarchy (approved as-is with known connector geometry refinement needed)
 - Point Details view
-- Trends tab core functionality
-- Associated Documents tab
 - Equipment tree structure
 - Primary navigation
 - EF status colors
 - Responsive behavior
+- Point Trend functionality in Operate tab (Trend View, Create Custom Trend, Add Point From, multi-equipment comparison, all interactions preserved)
 - Desktop and mobile reuse the same palette and status selectors; the update does not change sizes, gaps, layout, or navigation.

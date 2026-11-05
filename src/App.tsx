@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from 'react'
+import { useState } from 'react'
 import { EquipmentHierarchy } from './components/EquipmentHierarchy.tsx'
 import { EquipmentPage, type EquipmentTab } from './components/EquipmentPage.tsx'
 import { DocumentsPanel } from './components/EquipmentResources.tsx'
@@ -10,6 +10,7 @@ import { OperateOverview } from './components/OperateOverview.tsx'
 import { FilteredPoints } from './components/FilteredPoints.tsx'
 import { PrimaryNavigation } from './components/PrimaryNavigation.tsx'
 import { PrototypeShell } from './components/PrototypeShell.tsx'
+import { EquipmentGraphic } from './components/EquipmentGraphic.tsx'
 import {
   findEquipmentPath,
   equipmentHierarchy,
@@ -19,8 +20,6 @@ import { operateOverviewData, type PointFilter } from './data/operateOverview.ts
 import { trendPointDetails } from './data/trends.ts'
 import { overviewTrendPresets, pressureSetpointDetails, type OverviewTrendState } from './data/overviewTrends.ts'
 import { initialEquipmentNotes } from './data/equipmentResources.ts'
-
-const TrendsExperience = lazy(() => import('./components/TrendsExperience.tsx'))
 
 export default function App() {
   type EquipmentContext = {
@@ -107,10 +106,6 @@ export default function App() {
       setSelectedPointId(null)
       setPointsFilter(null)
       setActiveTab('Operate')
-    } else if (label === 'Trends') {
-      setSelectedPointId(null)
-      setPointsFilter(null)
-      setActiveTab('Trends')
     } else if (label === 'Alarms & Faults') {
       setSelectedPointId(null)
       setPointsFilter('alarm')
@@ -201,10 +196,8 @@ export default function App() {
           {activeTab === 'Points' && !selectedPoint && !pointsFilter && (
             <PointDirectory onSelectPoint={openPointDetails} />
           )}
-          {activeTab === 'Trends' && (
-            <Suspense fallback={null}>
-              <TrendsExperience onViewPoint={openPointDetails} />
-            </Suspense>
+          {activeTab === 'Equipment Graphic' && (
+            <EquipmentGraphic />
           )}
           {activeTab === 'Associated Documents' && (
             <DocumentsPanel selectedDocumentId={selectedDocumentId} onSelectDocument={setSelectedDocumentId} />

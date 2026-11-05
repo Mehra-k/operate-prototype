@@ -577,10 +577,11 @@ export function TrendWorkspace({
         </div>
       )}
 
-      {/* Trend View */}
-      <div className="overview-point-trend__trend-controls">
-        <div className="overview-point-trend__trend-view">
-          <h3>Trend View</h3>
+      {/* Two-column lower controls */}
+      <div className="overview-point-trend__lower-controls">
+        {/* Left column: Trend View only */}
+        <div className="overview-point-trend__lower-column overview-point-trend__lower-column--left">
+          <h3 className="overview-point-trend__section-title">Trend View</h3>
           <select
             value={customTrendState.isActive ? 'custom' : activeView.id}
             onChange={(event) => {
@@ -591,6 +592,7 @@ export function TrendWorkspace({
               }
             }}
             aria-label="Select trend view"
+            className="overview-point-trend__trend-view-select"
           >
             <optgroup label="Pre-built trends">
               {state.views
@@ -603,57 +605,55 @@ export function TrendWorkspace({
             </optgroup>
           </select>
         </div>
-        <button
-          type="button"
-          onClick={toggleCustomTrendMode}
-          className="overview-point-trend__create-custom-btn"
-          aria-label="Create custom trend"
-        >
-          <Plus size={16} aria-hidden="true" />
-          Create custom trend
-        </button>
-      </div>
 
-      {/* Add point from controls */}
-      {customTrendState.isActive && (
-        <>
-          <div className="overview-point-trend__add-point-from-section">
-            <h4>Add point from</h4>
+        {/* Right column: Create Custom Trend section and Add Point From (when in custom mode) */}
+        {customTrendState.isActive && (
+          <div className="overview-point-trend__lower-column overview-point-trend__lower-column--right">
+            {/* Create Custom Trend as a heading only */}
+            <h3 className="overview-point-trend__section-title overview-point-trend__create-custom-heading">
+              Create Custom Trend
+            </h3>
 
-            {/* Source selector */}
-            <div className="overview-point-trend__add-point-from" aria-label="Add point from">
-              <label style={{ minWidth: '140px' }}>
-                <span className="overview-point-trend__sr-only">Point source</span>
-                <select
-                  value={source}
-                  onChange={(event) => {
-                    onSourceChange(event.target.value as TrendSource)
-                    onPointToAddChange('')
-                    onSelectedRelatedEquipmentChange('')
-                    onSelectedEquipmentIdsChange(new Set())
-                    onShowWiderSiteDropdownChange(false)
-                  }}
-                  aria-label="Point source"
-                >
-                  {sources.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-              </label>
+            {/* Add Point From section */}
+            <div className="overview-point-trend__add-point-from-section">
+              <h4 className="overview-point-trend__add-point-from-heading">Add Point From</h4>
 
-              {/* Current equipment: point selector */}
-              {source === 'Current equipment' && (
-                <>
-                  <label style={{ minWidth: '140px' }}>
-                    <span style={{ visibility: 'hidden' }}>Point</span>
-                    <select
-                      value={pointToAdd}
-                      onChange={(event) => onPointToAddChange(event.target.value)}
-                      aria-label="Point to add"
+              {/* Add point from controls */}
+              <div className="overview-point-trend__add-point-from-controls" aria-label="Add point from">
+                <label className="overview-point-trend__source-label">
+                  <span className="overview-point-trend__sr-only">Point source</span>
+                  <select
+                    value={source}
+                    onChange={(event) => {
+                      onSourceChange(event.target.value as TrendSource)
+                      onPointToAddChange('')
+                      onSelectedRelatedEquipmentChange('')
+                      onSelectedEquipmentIdsChange(new Set())
+                      onShowWiderSiteDropdownChange(false)
+                    }}
+                    aria-label="Point source"
+                    className="overview-point-trend__source-select"
+                  >
+                    {sources.map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                {/* Current equipment: point selector */}
+                {source === 'Current equipment' && (
+                  <>
+                    <label className="overview-point-trend__point-label">
+                      <span className="overview-point-trend__sr-only">Point</span>
+                      <select
+                        value={pointToAdd}
+                        onChange={(event) => onPointToAddChange(event.target.value)}
+                        aria-label="Point to add"
+                        className="overview-point-trend__point-select"
                     >
-                      <option value="">Select a point</option>
+                      <option value="">Select point</option>
                       {availableSeries.map((item) => (
                         <option value={item.id} key={item.id}>
                           {item.name}
@@ -670,146 +670,150 @@ export function TrendWorkspace({
                     <Plus size={16} aria-hidden="true" />
                     Add point
                   </button>
-                </>
-              )}
+                  </>
+                )}
 
-              {/* Related equipment: equipment then point selector */}
-              {source === 'Related equipment' && (
-                <>
-                  <label style={{ minWidth: '140px' }}>
-                    <span style={{ visibility: 'hidden' }}>Equipment</span>
-                    <select
-                      value={selectedRelatedEquipment}
-                      onChange={(event) => {
-                        onSelectedRelatedEquipmentChange(event.target.value)
-                        onPointToAddChange('')
-                      }}
-                      aria-label="Related equipment"
-                    >
-                      <option value="">Select equipment</option>
-                      {relatedEquipmentOptions.map((item) => (
-                        <option value={item.id} key={item.id}>
-                          {item.name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-
-                  {selectedRelatedEquipment && (
-                    <>
-                      <label style={{ minWidth: '140px' }}>
-                        <span style={{ visibility: 'hidden' }}>Point</span>
-                        <select
-                          value={pointToAdd}
-                          onChange={(event) => onPointToAddChange(event.target.value)}
-                          aria-label="Point to add"
-                        >
-                          <option value="">Select a point</option>
-                          {availableSeries.map((item) => (
-                            <option value={item.id} key={item.id}>
-                              {item.name}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      <button
-                        type="button"
-                        disabled={!pointToAdd}
-                        onClick={addPointToCustomTrend}
-                        className="overview-point-trend__add-point-btn"
+                {/* Related equipment: equipment then point selector */}
+                {source === 'Related equipment' && (
+                  <>
+                    <label className="overview-point-trend__equipment-label">
+                      <span className="overview-point-trend__sr-only">Equipment</span>
+                      <select
+                        value={selectedRelatedEquipment}
+                        onChange={(event) => {
+                          onSelectedRelatedEquipmentChange(event.target.value)
+                          onPointToAddChange('')
+                        }}
+                        aria-label="Related equipment"
+                        className="overview-point-trend__equipment-select"
                       >
-                        <Plus size={16} aria-hidden="true" />
-                        Add point
-                      </button>
-                    </>
-                  )}
-                </>
-              )}
+                        <option value="">Select equipment</option>
+                        {relatedEquipmentOptions.map((item) => (
+                          <option value={item.id} key={item.id}>
+                            {item.name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
 
-              {/* Wider site: dropdown + point selector */}
-              {source === 'Wider site' && (
-                <div className="wider-site-picker-row">
-                  <div className="wider-site-dropdown-container" style={{ minWidth: '140px', position: 'relative' }}>
-                    <button
-                      type="button"
-                      className="wider-site-dropdown-trigger"
-                      onClick={() => onShowWiderSiteDropdownChange(!showWiderSiteDropdown)}
-                      aria-expanded={showWiderSiteDropdown}
-                      aria-label="Select equipment"
-                    >
-                      {selectedEquipmentIds.size === 0
-                        ? 'Select equipment'
-                        : selectedEquipmentIds.size === 1
-                          ? Array.from(selectedEquipmentIds)[0]
-                          : `${selectedEquipmentIds.size} equipment selected`}
-                      <ChevronDown size={16} />
-                    </button>
-
-                    {showWiderSiteDropdown && (
+                    {selectedRelatedEquipment && (
                       <>
-                        <div className="wider-site-dropdown-backdrop" onClick={() => onShowWiderSiteDropdownChange(false)} />
-                        <div className="wider-site-dropdown-popover">
-                          {renderEquipmentTree(equipmentHierarchy)}
-                        </div>
+                        <label className="overview-point-trend__point-label">
+                          <span className="overview-point-trend__sr-only">Point</span>
+                          <select
+                            value={pointToAdd}
+                            onChange={(event) => onPointToAddChange(event.target.value)}
+                            aria-label="Point to add"
+                            className="overview-point-trend__point-select"
+                          >
+                            <option value="">Select point</option>
+                            {availableSeries.map((item) => (
+                              <option value={item.id} key={item.id}>
+                                {item.name}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <button
+                          type="button"
+                          disabled={!pointToAdd}
+                          onClick={addPointToCustomTrend}
+                          className="overview-point-trend__add-point-btn"
+                        >
+                          <Plus size={16} aria-hidden="true" />
+                          Add point
+                        </button>
                       </>
                     )}
-                  </div>
+                  </>
+                )}
 
-                  {selectedEquipmentIds.size > 0 && (
-                    <>
-                      <label style={{ minWidth: '140px' }}>
-                        <span style={{ visibility: 'hidden' }}>Point</span>
-                        <select
-                          value={pointToAdd}
-                          onChange={(event) => onPointToAddChange(event.target.value)}
-                          aria-label="Point to add"
-                        >
-                          <option value="">Select a point</option>
-                          {availableSeries.map((item) => (
-                            <option value={item.id} key={item.id}>
-                              {item.name}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
+                {/* Wider site: dropdown + point selector */}
+                {source === 'Wider site' && (
+                  <>
+                    <div className="wider-site-dropdown-container">
                       <button
                         type="button"
-                        disabled={!pointToAdd}
-                        onClick={addPointToCustomTrend}
-                        className="overview-point-trend__add-point-btn"
+                        className="wider-site-dropdown-trigger"
+                        onClick={() => onShowWiderSiteDropdownChange(!showWiderSiteDropdown)}
+                        aria-expanded={showWiderSiteDropdown}
+                        aria-label="Select equipment"
                       >
-                        <Plus size={16} aria-hidden="true" />
-                        Add point
+                        {selectedEquipmentIds.size === 0
+                          ? 'Select equipment'
+                          : selectedEquipmentIds.size === 1
+                            ? Array.from(selectedEquipmentIds)[0]
+                            : `${selectedEquipmentIds.size} selected`}
+                        <ChevronDown size={16} />
                       </button>
-                    </>
-                  )}
+
+                      {showWiderSiteDropdown && (
+                        <>
+                          <div className="wider-site-dropdown-backdrop" onClick={() => onShowWiderSiteDropdownChange(false)} />
+                          <div className="wider-site-dropdown-popover">
+                            {renderEquipmentTree(equipmentHierarchy)}
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    {selectedEquipmentIds.size > 0 && (
+                      <>
+                        <label className="overview-point-trend__point-label">
+                          <span className="overview-point-trend__sr-only">Point</span>
+                          <select
+                            value={pointToAdd}
+                            onChange={(event) => onPointToAddChange(event.target.value)}
+                            aria-label="Point to add"
+                            className="overview-point-trend__point-select"
+                          >
+                            <option value="">Select point</option>
+                            {availableSeries.map((item) => (
+                              <option value={item.id} key={item.id}>
+                                {item.name}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <button
+                          type="button"
+                          disabled={!pointToAdd}
+                          onClick={addPointToCustomTrend}
+                          className="overview-point-trend__add-point-btn"
+                        >
+                          <Plus size={16} aria-hidden="true" />
+                          Add point
+                        </button>
+                      </>
+                    )}
+                  </>
+                )}
+              </div>
+
+              {/* Selected points below Add Point From controls */}
+              {customTrendState.selectedPointIds.length > 0 && (
+                <div className="overview-point-trend__selected-points">
+                  {customTrendState.selectedPointIds.map((pointId) => {
+                    const seriesItem = overviewTrendSeries.find((s) => s.id === pointId)
+                    return seriesItem ? (
+                      <button
+                        key={pointId}
+                        type="button"
+                        className="overview-point-trend__selected-point-chip"
+                        title={`Remove ${seriesItem.name}`}
+                        onClick={() => removePointFromCustomTrend(pointId)}
+                      >
+                        {seriesItem.name}
+                        <X size={14} aria-hidden="true" />
+                      </button>
+                    ) : null
+                  })}
                 </div>
               )}
             </div>
           </div>
-
-          {/* Selected points */}
-          {customTrendState.selectedPointIds.length > 0 && (
-            <div className="overview-point-trend__selected-points">
-              {customTrendState.selectedPointIds.map((pointId) => {
-                const seriesItem = overviewTrendSeries.find((s) => s.id === pointId)
-                return seriesItem ? (
-                  <button
-                    key={pointId}
-                    type="button"
-                    className="overview-point-trend__selected-point-chip"
-                    title={`Remove ${seriesItem.name}`}
-                    onClick={() => removePointFromCustomTrend(pointId)}
-                  >
-                    {seriesItem.name}
-                    <X size={14} aria-hidden="true" />
-                  </button>
-                ) : null
-              })}
-            </div>
-          )}
-        </>
-      )}
+        )}
+      </div>
     </div>
   )
 }

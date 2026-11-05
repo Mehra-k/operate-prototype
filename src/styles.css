@@ -5097,3 +5097,285 @@ input:focus-visible {
   font-size: 12px;
   height: 28px;
 }
+
+/* Two-column lower controls layout */
+.overview-point-trend__lower-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e1e3e5;
+}
+
+.overview-point-trend__lower-column {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 0;
+}
+
+.overview-point-trend__section-title {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #454a50;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Trend View controls (left column) */
+.overview-point-trend__trend-view-select {
+  min-width: 140px;
+  max-width: 340px;
+  min-height: 28px;
+  padding: 4px 8px;
+  border: 1px solid #d6dade;
+  border-radius: 3px;
+  background: #ffffff;
+  color: #202124;
+  font-size: 9px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Create Custom Trend heading in right column */
+.overview-point-trend__create-custom-heading {
+  margin: 0;
+  margin-bottom: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #454a50;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Add Point From section */
+.overview-point-trend__add-point-from-section {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+/* Add Point From heading */
+.overview-point-trend__add-point-from-heading {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 500;
+  color: #454a50;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.overview-point-trend__create-custom-btn {
+  display: none;
+}
+
+.overview-point-trend__create-custom-btn:hover:not(:disabled) {
+  background: #f0f3f6;
+}
+
+.overview-point-trend__create-custom-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Add Point From controls (right column) */
+.overview-point-trend__add-point-from-controls {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.overview-point-trend__source-label,
+.overview-point-trend__equipment-label,
+.overview-point-trend__point-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+}
+
+.overview-point-trend__source-select,
+.overview-point-trend__equipment-select,
+.overview-point-trend__point-select {
+  min-height: 28px;
+  min-width: 140px;
+  padding: 4px 8px;
+  border: 1px solid #d6dade;
+  border-radius: 3px;
+  background: #ffffff;
+  color: #202124;
+  font-size: 9px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.overview-point-trend__source-select {
+  max-width: 200px;
+}
+
+.overview-point-trend__equipment-select {
+  max-width: 220px;
+}
+
+.overview-point-trend__point-select {
+  max-width: 220px;
+}
+
+.overview-point-trend__add-point-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 4px 12px;
+  border: 1px solid #d6dade;
+  border-radius: 3px;
+  background: #ffffff;
+  color: #202124;
+  font-size: 9px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.overview-point-trend__add-point-btn:hover:not(:disabled) {
+  background: #f0f3f6;
+}
+
+.overview-point-trend__add-point-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Wider site dropdown styling */
+.wider-site-dropdown-container {
+  position: relative;
+  min-width: 140px;
+  max-width: 220px;
+}
+
+.wider-site-dropdown-trigger {
+  width: 100%;
+  min-height: 28px;
+  padding: 4px 8px;
+  border: 1px solid #d6dade;
+  border-radius: 3px;
+  background: #ffffff;
+  color: #202124;
+  font-size: 9px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-family: inherit;
+  transition: background-color 0.2s ease;
+}
+
+.wider-site-dropdown-trigger:hover {
+  background: #f0f3f6;
+}
+
+.wider-site-dropdown-trigger[aria-expanded="true"] {
+  background: #e8f0fe;
+  border-color: #1769aa;
+}
+
+.wider-site-dropdown-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+}
+
+.wider-site-dropdown-popover {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 11;
+  background: #ffffff;
+  border: 1px solid #d6dade;
+  border-radius: 3px;
+  box-shadow: 0 2px 8px rgba(22, 29, 37, 0.12);
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Selected points section */
+.overview-point-trend__selected-points {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.overview-point-trend__selected-point-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+  padding: 2px 8px;
+  border: 1px solid #d6dade;
+  border-radius: 3px;
+  background: #f0f3f6;
+  color: #202124;
+  font-size: 9px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.overview-point-trend__selected-point-chip:hover {
+  background: #e8eff7;
+  border-color: #1769aa;
+  color: #1769aa;
+}
+
+/* Responsive layout adjustments */
+@media (max-width: 1024px) {
+  .overview-point-trend__lower-controls {
+    gap: 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  .overview-point-trend__lower-controls {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .overview-point-trend__trend-view-select {
+    max-width: 100%;
+  }
+
+  .overview-point-trend__source-select,
+  .overview-point-trend__equipment-select,
+  .overview-point-trend__point-select {
+    max-width: 100%;
+  }
+
+  .wider-site-dropdown-trigger {
+    width: 100%;
+  }
+}
+
+/* Equipment Graphic */
+.equipment-graphic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  min-height: 400px;
+  background: #ffffff;
+}
+
+.equipment-graphic__image {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}

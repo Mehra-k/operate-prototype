@@ -29,7 +29,7 @@ Do not redesign, add features, change approved terminology/colors/counts, create
 
 ## Implemented Views and Interactions
 
-- Default equipment: AHU-SA-01. Tabs, in order: Operate, Points, Trends, Associated Documents.
+- Default equipment: AHU-SA-01. Tabs, in order: Operate, Equipment Graphic, Points, Associated Documents.
 - Operate: full-width Active Alarms above the tabs; combined Equipment Properties and Field Information card (single column with Properties above Field Information); Controlling Devices and Equipment State cards stacked below in left column on desktop; roll-up; compact Key Points; inline pressure trend directly above Related Equipment; Notes in the right-side area (collapsible).
 - Operational Roll-up: Uses improved typography for better readability. Status titles (Healthy, In Alarm, In Override) are now **bold text** with their respective EF status colors (green, red, purple) to make status easier to identify without relying solely on color. Main values (e.g., 11 / 14, 2 / 14, 1 / 14) remain visually dominant. Trend information and counts maintain the established visual hierarchy. Key Points typography has been refined throughout for improved readability.
 - Page Layout: Approximately 50px of white breathing room appears below the final page content to provide visual spacing at the end of the scrollable content area.
@@ -43,6 +43,7 @@ Do not redesign, add features, change approved terminology/colors/counts, create
 - Inline Point Trend defaults to Duct Static Pressure + Duct Static Pressure SP, with a Reheat/Supply Air Temperature/Discharge Air Temperature alternative. Supports 4h/12h/24h/7d ranges, tooltip/hover line, visibility/focus/scale, event hover/click/keyboard controls, and exact View point navigation. Presets are protected; duplicate before editing. Custom views support create/rename/remove and series additions/removals from current equipment, related equipment, and wider site.
 - Separate Trends tab supports the original airflow and reheat comparisons, 12h/24h ranges, hover values, focus/scale, inline event details, View Point, three-source point additions, and duplicate/remove custom views. Do not silently merge it with the Overview panel or assume their management features are identical.
 - Associated Documents appears only in its tab. Five local entries include expandable Preview (Equipment Photos shows gallery of three images; other documents show placeholder preview) and Download actions. Selection persists across tabs but no documents are downloaded/fetched.
+- Equipment Graphic: Displays a static placeholder graphic of the AHU equipment schematic. The image is a supplied asset showing the equipment layout with visible areas such as exhaust damper, return fan, return air, outside air, return damper, coil, supply fan, and discharge conditions. The graphic is not interactive at this stage.
 - Notes: On desktop, Notes is a right-side column visible by default within the Overview area. The Notes header shows a **ChevronUp (↑)** collapse control. Clicking it hides the entire Notes column and expands the main content area to full available width. No empty Notes column remains. Main content cards preserve their existing hierarchy and proportional widths. When Notes is collapsed, a "Notes" reopen button with a **ChevronDown (↓)** icon appears on the same row as the "Overview" heading, aligned to the far right. This button does NOT appear beside Active Alarms or at the bottom of the page. The Open Notes button remains visible without scrolling. Clicking the Notes button restores the Notes right-side column, and the Overview-level Notes button disappears. The original two-column layout is restored when Notes is reopened. Main content expands to use the full available width when Notes is collapsed, and returns to two-column layout when Notes reopens. Notes state and content (added notes, resolved status, input draft) are preserved during collapse and reopen. On mobile, Notes behavior follows the existing responsive design and is not affected by the collapse control.
 - Notes has an always-visible input, Cancel, and Add note alongside existing records. Cancel clears the draft without closing it. Add creates author/date/time metadata; Resolve/Delete work without real permissions. Saved notes and document selection survive tab switches in the current session.
 - Field Information is rendered once inside the combined card with Properties, with a left image, Location/Access/Orientation, and Edit. Its local form supports Save/Cancel. Customize chooses visible Equipment State fields. Alarm Acknowledge/Clear controls provide local toggle/request feedback; Clear does not remove mock alarm records or change counts.
@@ -191,6 +192,39 @@ The Operate Point Trend no longer includes:
 - **Related Equipment connector lines:** Related Equipment connector lines are functional and successfully visualize the equipment hierarchy. However, some connector geometry/alignment still needs visual refinement—for example, some vertical lines do not align perfectly with card boundaries. The diagram layout, structure, node positions, and interaction model are approved and stable. Do not redesign the diagram or rebuild the connector architecture without an explicit request. Any future refinement must preserve the existing layout.
 
 - **Wider Site equipment-tree visual styling:** Wider Site tree currently requires visual refinement. Parent/location nodes (Riverside Complex, Tower A, Floor 1, Second Floor, Third Floor, South Office, East Office, Warehouse) should be rendered as compact navigation-tree rows rather than bordered form-control-like elements. Location/group nodes should use clear ChevronRight (collapsed) / ChevronDown (expanded) treatment without checkboxes. Equipment leaf nodes should use checkboxes for selection. Tree indentation should clearly communicate hierarchy depth (0px, 16px, 32px, 48px). Current styling overrides applied; additional visual refinement may be needed in future iterations. Do not redesign the hierarchy or invent missing equipment without an explicit request. The tree uses only existing equipment data from `src/data/equipment.ts`.
+
+## Equipment Graphic Tab (November 5, 2026)
+
+### Tab Structure Update
+
+The equipment-page tabs have been refactored. The standalone **Trends** tab has been removed from equipment navigation. Trend functionality is now available exclusively through the **Operate** tab via the inline Point Trend card.
+
+**New Tab Order:**
+1. Operate
+2. Equipment Graphic
+3. Points
+4. Associated Documents
+
+### Equipment Graphic Implementation
+
+- **Purpose:** Provides a visual representation of the equipment layout and structure
+- **Current Implementation:** Displays a static, non-interactive AHU equipment graphic placeholder
+- **Image Asset:** `src/assets/ahu-graphic.png` (provided reference image showing AHU schematic with labeled areas)
+- **Component:** `EquipmentGraphic.tsx` renders the image centered in a flex container with responsive scaling
+- **Styling:** Image uses `object-fit: contain` to maintain aspect ratio; sizing is responsive to viewport width
+- **Status:** Placeholder implementation; ready for future interactive enhancements (e.g., clickable zones, real-time overlays, performance indicators)
+
+### Preserved Trend Functionality
+
+The removal of the Trends tab does **NOT** affect trend capabilities in the Operate tab:
+- **Point Trend – Duct Static Pressure** remains fully functional in the Operate tab
+- **Trend View** selection still available
+- **Create Custom Trend** workspace preserved
+- **Add Point From** (This equipment, Related equipment, Wider site) fully intact
+- **Multi-equipment comparison** supported
+- **Selected-series chips** management working
+- **Expand/Reset/time-range controls** all available
+- **Shared inline/expanded state** maintained
 
 ## Run, Build, and Git
 
