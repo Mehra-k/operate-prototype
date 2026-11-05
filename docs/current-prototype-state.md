@@ -1,14 +1,40 @@
 # Current Operate Prototype State
 
-Checkpoint date: November 5, 2026 at 14:28 UTC. Read this first when continuing in a new Agent chat, then inspect the referenced code and [requirements](operate-requirements.md). The repository, not past conversation history, is the source of truth.
+Checkpoint date: November 5, 2026 at 15:20 UTC. Read this first when continuing in a new Agent chat, then inspect the referenced code and [requirements](operate-requirements.md). The repository, not past conversation history, is the source of truth.
 
 ## Latest Updates (November 5, 2026)
 
-**Session 7 Summary:**
+**Session 10 Summary (Current Checkpoint):**
+1. ✅ **Notes Tab Implementation:** New dedicated Notes tab for historical equipment note discovery. Tab appears after "Associated Documents" in the tab order. Features include:
+   - **Shared State:** Notes data synchronized between Operate Notes sidebar panel and Notes tab (single source of truth managed at App.tsx level)
+   - **Mock Data:** 41 realistic HVAC operations notes spanning Aug 30 → Nov 5, 2026 (3+ months of historical data)
+   - **Search:** Real-time multi-field search across note content, author, and datetime (case-insensitive)
+   - **Time Filters:** All time, Today, Last 7 days, Last 30 days, Custom date range (generates different results per filter)
+   - **Sort:** Newest first (default) and Oldest first options
+   - **Compact List Design:** Dense chronological list (not card-based) with 56-72px typical row height. Avatar (24px), author (12px), datetime (10px), content (12px), delete button. Subtle 1px border dividers between rows.
+   - **Scrollable Container:** List uses max-height: 60vh with overflow-y: auto. Toolbar (search, filter, sort) remains fixed ABOVE scroll area. Result count displayed above list.
+   - **Add/Delete Sync:** New notes appear immediately in both Operate panel and Notes tab. Deletes remove from shared state and sync to both views.
+   - **Empty States:** "No notes yet" / "No search results" / "No filter results" with appropriate action buttons
+   - **Responsive:** Desktop (60vh), Tablet (wrapping controls), Mobile (50vh, 2-column grid layout)
+
+2. ✅ **Related Equipment Back Navigation:** Fixed "Back to..." button behavior in Related Equipment section. Now ALWAYS returns to origin equipment rather than previous equipment:
+   - **Origin Tracking:** New `relatedEquipmentOriginId` state captures starting equipment when user begins Related Equipment exploration
+   - **Stable Origin:** Origin equipment ID remains constant throughout exploration, no matter how many related equipment nodes user navigates through
+   - **Button Text:** "Back to [origin]" button persists with same text across all exploration steps
+   - **Direct Navigation:** Clicking back navigates directly to origin (not through intermediate visited equipment)
+   - **Context Reset:** Returns to Operate tab, clears equipment history, ends exploration context
+   - **New Exploration:** Starting from different equipment establishes new independent origin
+   - **Example:** User on AHU-SA-01 → clicks AHU-SA-02 → clicks Chiller CH-01 → clicks VAV-03 → button always says "Back to AHU-SA-01" → clicking back returns directly to AHU-SA-01
+
+**Session 9 Summary:**
+1. ✅ **Points Tab with Mock Data Optimization:** Expanded initialEquipmentNotes from 3 to 30+ realistic HVAC operations notes. Dates span Oct 20–Nov 5, 2026. Typography and spacing reduced for density: avatar 28px → compact display, padding 16px → 12px, gaps 12px → 8px. List container set to max-height: 60vh with overflow-y: auto for scrolling.
+
+**Session 8 Summary:**
 1. ✅ **Customise Key Points Dialog:** Fixed critical bugs where X, Cancel, and Apply buttons failed to close dialog. Root cause: CSS not respecting native `<dialog>` lifecycle (missing `[open]` attribute selector). Fixed by updating CSS to use `.key-points-customize[open]` for conditional display. All three buttons now work correctly with normal browser clicks.
 2. ✅ **Key Points Customise Button Styling:** Updated button to visually match Equipment State Customise button by making CSS selector more specific (`.key-points__header .key-points__customize`), revealing the border that was being overridden by parent selector.
 3. ✅ **Points Tab Redesign:** Replaced simple PointDirectory with new PointsTable component—searchable, sortable, paginated table with 6 columns (Point Name, Type, Current Value, Unit, Last Read, Status). Search filters across all fields (case-insensitive). Pagination with 10/25/50 items-per-page selector. Status badges use EF colors. Point names are clickable links to Point Details.
 4. ✅ **Point Trend Functionality Recovery:** Restored missing "+ Create custom trend" button that was removed during two-column layout refactoring. Button is now visible next to Trend View dropdown on the left. Clicking it activates right-column "Add Point From" section to add points from Current equipment, Related equipment, or Wider site (tree picker). All comparison and multi-equipment features functional.
+
 
 ## Architecture and Files
 
@@ -30,6 +56,7 @@ Do not redesign, add features, change approved terminology/colors/counts, create
 - `src/components/EquipmentResources.tsx`: shared Notes/Documents panels. Documents now include Preview and Download actions for each entry; Equipment Photos preview shows gallery of three images. Do not duplicate these implementations.
 - `src/components/OperationalRollup.tsx`, `KeyPointsSection.tsx`, `FilteredPoints.tsx`, `PointDetails.tsx`: shared status/point views and interactions.
 - `src/components/PointsTable.tsx` (NEW): Searchable, paginated Points table with 6 columns (Point Name, Type, Current Value, Unit, Last Read, Status). Replaces PointDirectory. Features: multi-field search (case-insensitive), items-per-page selector (10/25/50), pagination controls, status badges with EF colors, clickable point names navigate to Point Details. Uses shared `operateOverviewData.keyPoints` data.
+- `src/components/NotesTab.tsx` (NEW): Dedicated Notes tab for historical equipment note discovery. Appears after "Associated Documents" in tab order. Shared state with Operate Notes sidebar (single source of truth at App.tsx). Features: Real-time search (multi-field, case-insensitive), time filters (All time, Today, Last 7/30 days, Custom range), sort (Newest/Oldest first), dense compact list (24-32px avatar, 12px author/content, 10px datetime, subtle 1px row dividers), scrollable container (max-height: 60vh), add/delete with sync, empty states, responsive (60vh desktop, 50vh mobile). 41 mock notes spanning Aug 30–Nov 5, 2026.
 - `src/components/RelatedEquipment.tsx`: desktop diagram, mobile list, legend, Expand/Zoom/Reset, and equipment selection.
 - `src/components/PointTrendPanel.tsx` and `TrendWorkspace.tsx`: Inline Point Trend and expandable modal. Features restored in this checkpoint: "+ Create custom trend" button next to Trend View dropdown (left column). Clicking button activates "Add Point From" section (right column) with three source options: Current equipment, Related equipment, Wider site. Wider site includes equipment hierarchy tree with checkbox selection and collapsible nodes. Multi-equipment comparison with distinct series colors and source-equipment labels. Selected-series chips show removable comparisons. All state is temporary/session-only. Presets remain protected. `PointTrendChart.tsx` uses Recharts for visualization.
 - `src/components/TrendsExperience.tsx`: Separate Trends-tab experience (unchanged).
@@ -41,7 +68,7 @@ Do not redesign, add features, change approved terminology/colors/counts, create
 
 ## Implemented Views and Interactions
 
-- Default equipment: AHU-SA-01. Tabs, in order: Operate, Equipment Graphic, Points, Associated Documents.
+- Default equipment: AHU-SA-01. Tabs, in order: Operate, Equipment Graphic, Points, Associated Documents, Notes.
 - Operate: full-width Active Alarms above the tabs; combined Equipment Properties and Field Information card (single column with Properties above Field Information); Controlling Devices and Equipment State cards stacked below in left column on desktop; roll-up; compact Key Points; inline pressure trend directly above Related Equipment; Notes in the right-side area (collapsible).
 - Operational Roll-up: Uses improved typography for better readability. Status titles (Healthy, In Alarm, In Override) are now **bold text** with their respective EF status colors (green, red, purple) to make status easier to identify without relying solely on color. Main values (e.g., 11 / 14, 2 / 14, 1 / 14) remain visually dominant. Trend information and counts maintain the established visual hierarchy. Key Points typography has been refined throughout for improved readability.
 - Page Layout: Approximately 50px of white breathing room appears below the final page content to provide visual spacing at the end of the scrollable content area.
@@ -751,6 +778,80 @@ Current tab order for AHU-SA-01:
 2. **Equipment Graphic** (placeholder AHU image)
 3. **Points** (searchable Points table)
 4. **Associated Documents** (document entries + photos)
+5. **Notes** (historical notes discovery tab)
+
+---
+
+## Notes Tab (November 5, 2026)
+
+**Purpose:**
+Dedicated historical note discovery experience. Complements Operate Notes sidebar with search, filtering, and sorting capabilities for reviewing old equipment notes.
+
+**Features:**
+- **Shared State:** Notes synchronized with Operate Notes sidebar (single source of truth at App.tsx level)
+- **Data:** 41 realistic HVAC operations notes spanning Aug 30–Nov 5, 2026 (3+ months historical coverage)
+- **Search:** Real-time multi-field search (content, author, date) with case-insensitive matching
+- **Time Filters:**
+  - All time (41 notes)
+  - Today (2 notes)
+  - Last 7 days (16 notes)
+  - Last 30 days (28 notes)
+  - Custom date range (configurable From/To dates)
+- **Sort:** Newest first (default), Oldest first
+- **Add Note:** Creates new note with current timestamp and author. Appears immediately in Notes tab and Operate sidebar.
+- **Delete Note:** Removes note from shared state. Syncs to both Notes tab and Operate sidebar immediately.
+- **Layout:** Dense chronological list (not card-based)
+  - Avatar: 24px (desktop), 22px (mobile)
+  - Author: 12px font-weight 600
+  - Datetime: 10px, EF text-secondary color
+  - Content: 12px, line-height 1.35
+  - Row height: 56-72px typical
+  - Divider: 1px solid border-default between rows
+  - Vertical padding: 10px per row
+- **Scrollable Container:**
+  - Desktop: max-height 60vh
+  - Tablet: max-height calculated
+  - Mobile: max-height 50vh
+  - Toolbar (search, filter, sort) remains fixed above scroll area
+  - Result count displayed above list
+- **Empty States:**
+  - "No notes yet" (empty list)
+  - "No notes match your search" (search active, no results)
+  - "No notes match the selected filters" (filters active, no results)
+  - Action buttons provided (Add Note, Clear search, Clear filters)
+- **Active Filters:** Visual chips show applied filters with clear/remove options. "Clear all filters" button when filters active.
+- **Result Count:** Dynamic display updates with search/filter/sort combinations
+- **Responsive:** Desktop (all controls on one row), Tablet (controls wrap), Mobile (full vertical stack)
+
+**Note Authors (Existing Mock Users):**
+- Jon Smith
+- Andrew Thibado
+- Brent Lowe
+
+**HVAC Content Topics:**
+Duct static pressure monitoring, CO2 sensor investigations, supply/return air temperatures, supply fan operations, cooling valve modulation, filter maintenance, outdoor air damper position, equipment calibrations, commissioning, setpoint overrides, predictive maintenance, communication network testing, control loop tuning, humidity management, occupancy sensing, valve/damper operations.
+
+---
+
+## Related Equipment Navigation (November 5, 2026)
+
+**Fix:** "Back to..." button now correctly returns to origin equipment rather than previous equipment.
+
+**Implementation:**
+- **Origin Tracking:** `relatedEquipmentOriginId` state captures starting equipment when user begins Related Equipment exploration
+- **Stable Origin:** Remains constant throughout exploration, no matter how many nodes visited
+- **Button Text:** "Back to [origin]" persists with same text across all exploration steps (never changes as user navigates)
+- **Direct Navigation:** Clicking back navigates directly to origin (not through intermediate visited equipment)
+- **Context Reset:** Returns to Operate tab, clears equipment history, ends exploration context
+- **New Exploration:** Starting from different equipment establishes new independent origin
+
+**Example Scenario:**
+- User on AHU-SA-01 (no back button)
+- Click AHU-SA-02 → button says "Back to AHU-SA-01"
+- Click Chiller CH-01 → button still says "Back to AHU-SA-01"
+- Click VAV-01 → button still says "Back to AHU-SA-01"
+- Click VAV-03 → button still says "Back to AHU-SA-01"
+- Click "Back to AHU-SA-01" → navigates directly to AHU-SA-01, clears exploration context
 
 ---
 
@@ -787,4 +888,20 @@ Current tab order for AHU-SA-01:
 - Notes not persisted (session-only)
 
 **Note:** All state is managed via React `useState`, not localStorage or backend. No persistence beyond current session.
+
+---
+
+## Known Issues & Future Refinement
+
+**None currently documented.** All major features are implemented and working as designed. The prototype is stable for the approved feature set.
+
+**Future Enhancement Opportunities (not approved for current implementation):**
+- Backend/database persistence for notes and documents
+- Real authentication and role-based permissions
+- Equipment time-machine playback (historical equipment state)
+- Graphics interactivity (clickable diagram components)
+- Advanced Equipment Graphic with equipment relationships highlighted
+- Automated parent-equipment diagnostic suggestions
+- Integration with asset management systems
+- Sensor validation and data quality scoring
 

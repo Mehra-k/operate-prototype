@@ -5,6 +5,7 @@ import { DocumentsPanel } from './components/EquipmentResources.tsx'
 import { ActiveAlarmSummary } from './components/ActiveAlarmSummary.tsx'
 import { PointDetails } from './components/PointDetails.tsx'
 import { PointsTable } from './components/PointsTable.tsx'
+import { NotesTab } from './components/NotesTab.tsx'
 import { OperateHeader } from './components/OperateHeader.tsx'
 import { OperateOverview } from './components/OperateOverview.tsx'
 import { FilteredPoints } from './components/FilteredPoints.tsx'
@@ -47,6 +48,7 @@ export default function App() {
     () => ({ views: overviewTrendPresets, activeViewId: overviewTrendPresets[0].id }),
   )
   const [notesOpen, setNotesOpen] = useState(true)
+  const [relatedEquipmentOriginId, setRelatedEquipmentOriginId] = useState<string | null>(null)
   const selectedPath = findEquipmentPath(equipmentHierarchy, selectedNodeId) ?? []
   const selectedNode = selectedPath.at(-1)
 
@@ -57,6 +59,11 @@ export default function App() {
       setSelectedPointId(null)
       setPointsFilter(null)
       return
+    }
+
+    // If we're not already in a related equipment exploration, start one
+    if (!relatedEquipmentOriginId) {
+      setRelatedEquipmentOriginId(selectedNodeId)
     }
 
     setEquipmentHistory((history) => [
@@ -80,6 +87,18 @@ export default function App() {
     setPointsFilter(previousContext.pointsFilter)
     setSelectedPointId(previousContext.selectedPointId)
     setEquipmentHistory((history) => history.slice(0, -1))
+  }
+
+  function returnToRelatedEquipmentOrigin() {
+    if (!relatedEquipmentOriginId) return
+
+    setSelectedNodeId(relatedEquipmentOriginId)
+    setActiveNavigation('Equipment')
+    setActiveTab('Operate')
+    setSelectedPointId(null)
+    setPointsFilter(null)
+    setEquipmentHistory([])
+    setRelatedEquipmentOriginId(null)
   }
 
   function openPointDetails(pointId: string) {
@@ -126,7 +145,7 @@ export default function App() {
     ...trendPointDetails,
     pressureSetpointDetails,
   ].find((point) => point.id === selectedPointId)
-  const previousEquipmentId = equipmentHistory.at(-1)?.selectedNodeId
+  const previousEquipmentId = relatedEquipmentOriginId
   const previousEquipmentName = previousEquipmentId
     ? findEquipmentPath(equipmentHierarchy, previousEquipmentId)?.at(-1)?.name
     : undefined
@@ -166,7 +185,7 @@ export default function App() {
               relatedEquipmentVisible={relatedEquipmentIds.has(selectedNodeId)}
               previousEquipmentName={previousEquipmentName}
               onSelectRelatedEquipment={navigateToEquipment}
-              onBackToPreviousEquipment={returnToPreviousEquipment}
+              onBackToPreviousEquipment={relatedEquipmentOriginId ? returnToRelatedEquipmentOrigin : returnToPreviousEquipment}
               pointTrendState={pointTrendState}
               onPointTrendStateChange={setPointTrendState}
               notes={notes}
@@ -194,6 +213,9 @@ export default function App() {
           )}
           {activeTab === 'Associated Documents' && (
             <DocumentsPanel selectedDocumentId={selectedDocumentId} onSelectDocument={setSelectedDocumentId} />
+          )}
+          {activeTab === 'Notes' && (
+            <NotesTab notes={notes} onNotesChange={setNotes} />
           )}
         </EquipmentPage>
       </div>
