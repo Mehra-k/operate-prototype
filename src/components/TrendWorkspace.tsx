@@ -579,7 +579,7 @@ export function TrendWorkspace({
 
       {/* Two-column lower controls */}
       <div className="overview-point-trend__lower-controls">
-        {/* Left column: Trend View with Create Custom Trend button */}
+        {/* Left column: Trend View */}
         <div className="overview-point-trend__lower-column overview-point-trend__lower-column--left">
           <h3 className="overview-point-trend__section-title">Trend View</h3>
           <div className="overview-point-trend__trend-view-row">
@@ -605,27 +605,22 @@ export function TrendWorkspace({
                   ))}
               </optgroup>
             </select>
-            <button
-              type="button"
-              onClick={toggleCustomTrendMode}
-              className="overview-point-trend__create-custom-btn"
-              aria-label="Create custom trend"
-            >
-              <Plus size={16} aria-hidden="true" />
-              Create custom trend
-            </button>
           </div>
         </div>
 
-        {/* Right column: Create Custom Trend section and Add Point From (when in custom mode) */}
-        {customTrendState.isActive && (
-          <div className="overview-point-trend__lower-column overview-point-trend__lower-column--right">
-            {/* Create Custom Trend as a heading only */}
-            <h3 className="overview-point-trend__section-title overview-point-trend__create-custom-heading">
-              Create Custom Trend
-            </h3>
-
-            {/* Add Point From section */}
+        {/* Right column: custom trend action and controls */}
+        <div className="overview-point-trend__lower-column overview-point-trend__lower-column--right">
+          <button
+            type="button"
+            onClick={toggleCustomTrendMode}
+            className="overview-point-trend__create-custom-btn"
+            aria-label="Create custom trend"
+          >
+            <Plus size={16} aria-hidden="true" />
+            Create custom trend
+          </button>
+          {/* Add Point From section */}
+          {customTrendState.isActive && (
             <div className="overview-point-trend__add-point-from-section">
               <h4 className="overview-point-trend__add-point-from-heading">Add Point From</h4>
 
@@ -822,8 +817,8 @@ export function TrendWorkspace({
                 </div>
               )}
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )
