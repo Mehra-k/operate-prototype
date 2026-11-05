@@ -4,7 +4,18 @@ Checkpoint date: November 5, 2026 at 15:20 UTC. Read this first when continuing 
 
 ## Latest Updates (November 5, 2026)
 
-**Session 10 Summary (Current Checkpoint):**
+**Session 11 Summary (Current Checkpoint - Final):**
+1. ✅ **Responsive Two-Column Operate Layout (Notes/Main Content Independent Heights):** Fixed layout architecture to ensure Notes panel height does NOT control vertical spacing of main Operate content sections. Converted `.operate-overview` from `display: contents` (passed all children to grid) to proper `display: flex; flex-direction: column` with dedicated grid column positioning. Main content now stacks in independent flex column with consistent 12px section gaps. Key metrics:
+   - **Container:** CSS Grid with 2 responsive columns (main ~1100px + Notes ~415px on desktop)
+   - **Main Content Column:** Flex container (flex-direction: column, gap: 12px) containing all main sections
+   - **Main Height:** Determined by content stacking (e.g., 1601px) - independent from Notes height
+   - **Notes Height:** Spans full grid height (e.g., 2150px with 41 notes) but uses `align-self: start` to NOT stretch main content
+   - **Result:** Notes can be much taller than main content without creating huge vertical whitespace between main sections
+   - **Section Gaps:** Overview → Rollup: 12px, Rollup → KeyPoints: 13px, KeyPoints → Trend: 12px (uses flex gap property)
+   - **Responsive Reflow:** When Notes open, Operational Rollup cards, Key Points cards, Point Trend chart all adapt to narrower main column width (1100px); when Notes closes, main content expands to full width naturally
+   - **CSS Changes:** `.operate-overview` from `display: contents` to flex with `grid-column: 1`, removed `grid-column: 1` from individual main sections (now flex children not grid children), verified `.equipment-resources` has correct `align-self: start` and `grid-row: 1/-1`
+
+**Session 10 Summary:**
 1. ✅ **Notes Tab Implementation:** New dedicated Notes tab for historical equipment note discovery. Tab appears after "Associated Documents" in the tab order. Features include:
    - **Shared State:** Notes data synchronized between Operate Notes sidebar panel and Notes tab (single source of truth managed at App.tsx level)
    - **Mock Data:** 41 realistic HVAC operations notes spanning Aug 30 → Nov 5, 2026 (3+ months of historical data)

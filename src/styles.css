@@ -496,7 +496,11 @@ body {
 }
 
 .operate-overview {
-  display: contents;
+  display: flex;
+  flex-direction: column;
+  grid-column: 1;
+  min-width: 0;
+  gap: 12px;
 }
 
 .operate-overview__header {
@@ -504,7 +508,6 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  grid-column: 1;
   margin-bottom: 0;
 }
 
@@ -544,7 +547,6 @@ body {
 .operational-rollup,
 .key-points,
 .related-equipment {
-  grid-column: 1;
 }
 
 .active-alarm-summary {
@@ -2577,11 +2579,11 @@ button.operational-rollup__item:hover {
   display: grid;
   min-width: 0;
   grid-column: 2;
-  grid-row: 2 / span 2;
+  grid-row: 1 / -1;
   grid-template-columns: minmax(0, 1fr);
-  align-items: stretch;
-  align-content: stretch;
-  align-self: stretch;
+  align-items: start;
+  align-content: start;
+  align-self: start;
   gap: 8px;
 }
 
@@ -3182,7 +3184,6 @@ input:focus-visible {
 
 .overview-point-trend,
 .overview-point-trend__loading {
-  grid-column: 1;
   min-width: 0;
   padding: 8px 9px;
   border: 1px solid #dfe1e4;
