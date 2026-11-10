@@ -20,7 +20,7 @@ import {
 import { operateOverviewData, type PointFilter } from './data/operateOverview.ts'
 import { trendPointDetails } from './data/trends.ts'
 import { overviewTrendPresets, pressureSetpointDetails, type OverviewTrendState } from './data/overviewTrends.ts'
-import { initialEquipmentNotes } from './data/equipmentResources.ts'
+import { equipmentDocuments, initialEquipmentNotes } from './data/equipmentResources.ts'
 
 export default function App() {
   type EquipmentContext = {
@@ -39,6 +39,7 @@ export default function App() {
   const [activeNavigation, setActiveNavigation] = useState('Equipment')
   const [activeTab, setActiveTab] = useState<EquipmentTab>('Operate')
   const [notes, setNotes] = useState(initialEquipmentNotes)
+  const [documents, setDocuments] = useState(equipmentDocuments)
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null)
   const [pointsFilter, setPointsFilter] = useState<PointFilter | null>(null)
   const [selectedPointId, setSelectedPointId] = useState<string | null>(null)
@@ -190,7 +191,8 @@ export default function App() {
               onPointTrendStateChange={setPointTrendState}
               notes={notes}
               onNotesChange={setNotes}
-              onViewDocuments={() => setActiveTab('Associated Documents')}
+              onViewAllNotes={() => setActiveTab('Notes')}
+              onViewDocuments={() => setActiveTab('Files')}
               notesOpen={notesOpen}
               onToggleNotes={setNotesOpen}
             />
@@ -211,8 +213,8 @@ export default function App() {
           {activeTab === 'Equipment Graphic' && (
             <EquipmentGraphic />
           )}
-          {activeTab === 'Associated Documents' && (
-            <DocumentsPanel selectedDocumentId={selectedDocumentId} onSelectDocument={setSelectedDocumentId} />
+          {activeTab === 'Files' && (
+            <DocumentsPanel documents={documents} onDocumentsChange={setDocuments} selectedDocumentId={selectedDocumentId} onSelectDocument={setSelectedDocumentId} />
           )}
           {activeTab === 'Notes' && (
             <NotesTab notes={notes} onNotesChange={setNotes} />

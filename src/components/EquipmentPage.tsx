@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { ChevronRight } from 'lucide-react'
 
-export type EquipmentTab = 'Operate' | 'Equipment Graphic' | 'Points' | 'Associated Documents' | 'Notes'
+export type EquipmentTab = 'Operate' | 'Equipment Graphic' | 'Points' | 'Files' | 'Notes'
 
 type EquipmentPageProps = {
   equipmentName: string
@@ -44,7 +44,7 @@ export function EquipmentPage({
         <div className="equipment-page__header">
           {headerContent}
           <div className="equipment-page__tabs" role="tablist" aria-label="Equipment views">
-            {(['Operate', 'Equipment Graphic', 'Points', 'Associated Documents', 'Notes'] as const).map((tab) => (
+            {(['Operate', 'Equipment Graphic', 'Points', 'Files', 'Notes'] as const).map((tab) => (
               <button
                 className={`equipment-page__tab${activeTab === tab ? ' is-active' : ''}`}
                 id={`tab-${tab.toLowerCase().replaceAll(' ', '-')}`}

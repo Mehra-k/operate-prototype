@@ -43,6 +43,7 @@ export function OperateOverview({
   onPointTrendStateChange,
   notes,
   onNotesChange,
+  onViewAllNotes,
   onViewDocuments,
   notesOpen = true,
   onToggleNotes,
@@ -69,7 +70,7 @@ export function OperateOverview({
         <nav className="operate-overview__mobile-shortcuts" aria-label="Troubleshooting shortcuts">
           <a href="#notes-heading">Notes</a>
           <a href="#field-information-heading">Field information</a>
-          <button type="button" onClick={onViewDocuments}>Documents</button>
+          <button type="button" onClick={onViewDocuments}>Files</button>
           {relatedEquipmentVisible && <a href="#related-equipment-heading">Related equipment</a>}
         </nav>
         <div className="operate-overview__cards">
@@ -95,7 +96,7 @@ export function OperateOverview({
           />
         )}
       </div>
-      <EquipmentResources notes={notes} onNotesChange={onNotesChange} notesOpen={notesOpen} onToggleNotes={onToggleNotes} />
+      <EquipmentResources notes={notes} onNotesChange={onNotesChange} onViewAllNotes={onViewAllNotes} notesOpen={notesOpen} onToggleNotes={onToggleNotes} />
     </div>
   )
 }

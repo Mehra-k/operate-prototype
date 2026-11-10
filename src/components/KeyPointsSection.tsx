@@ -2,9 +2,11 @@ import { useRef, useState } from 'react'
 import { ChevronRight, Settings2, X } from 'lucide-react'
 import {
   formatPointValue,
+  getPointStatuses,
   operateOverviewData,
   type KeyPoint,
 } from '../data/operateOverview.ts'
+import { PointStatusChips } from './PointStatusChips.tsx'
 
 type KeyPointsSectionProps = {
   onSelectPoint: (pointId: string) => void
@@ -23,21 +25,19 @@ function KeyPointCard({
     <button
       className={`key-point-card is-${stateClass}`}
       type="button"
-      aria-label={`View ${point.pointName}: ${formatPointValue(point.value, point.unit)}, ${point.state}`}
+      aria-label={`View ${point.pointName}: ${formatPointValue(point.value, point.unit)}, ${getPointStatuses(point).join(', ')}`}
       onClick={() => onSelectPoint(point.id)}
     >
       <span className="key-point-card__heading">
         <span>{point.pointName}</span>
         <ChevronRight size={13} aria-hidden="true" />
       </span>
+      <PointStatusChips point={point} />
       <span className={`key-point-card__reading${point.unit === '%' ? ' is-percent' : ''}`}>
         <span>{point.value}</span>
         <small>{point.unit}</small>
       </span>
       <span className="key-point-card__metadata">
-        <span className="key-point-card__state">
-          {point.state}
-        </span>
         <span className="key-point-card__updated">{point.updated}</span>
       </span>
     </button>
@@ -158,9 +158,7 @@ export function KeyPointsSection({
               <span className="key-points-customize__point-value">
                 {formatPointValue(point.value, point.unit)}
               </span>
-              <span className={`key-points-customize__point-state is-${point.state.toLowerCase()}`}>
-                {point.state}
-              </span>
+              <PointStatusChips point={point} />
             </label>
           ))}
         </div>
@@ -168,7 +166,7 @@ export function KeyPointsSection({
           <button type="button" onClick={handleCancelCustomise}>
             Cancel
           </button>
-          <button type="button" onClick={handleApplyCustomise} className="key-points-customize__apply">
+          <button type="button" onClick={handleApplyCustomise} disabled={draftKeyPointIds.size === 0} className="key-points-customize__apply">
             Apply
           </button>
         </footer>

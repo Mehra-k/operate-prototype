@@ -5,13 +5,28 @@ export type EquipmentNote = {
   date: string
   time: string
   datetime: string
+  type: 'user-generated' | 'system-generated'
+}
+
+export function createEquipmentNote(content: string): EquipmentNote {
+  const createdAt = new Date()
+  return {
+    id: `note-${createdAt.getTime()}`,
+    content,
+    author: 'Jon Smith',
+    date: new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(createdAt),
+    time: new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' }).format(createdAt),
+    datetime: createdAt.toISOString(),
+    type: 'user-generated',
+  }
 }
 
 export type EquipmentDocument = {
   id: string
   name: string
-  type: 'PDF' | 'XLSX' | 'ZIP'
+  type: string
   size: string
+  file?: File
 }
 
 export type FieldInformation = {
@@ -20,7 +35,7 @@ export type FieldInformation = {
   orientation: string
 }
 
-export const initialEquipmentNotes: EquipmentNote[] = [
+const historicalEquipmentNotes = [
   {
     id: 'note-20261105-1430',
     content: 'Duct static pressure reviewed after alarm. Supply fan amp draw normal. Damper position verified at 45%.',
@@ -349,6 +364,30 @@ export const initialEquipmentNotes: EquipmentNote[] = [
     time: '11:00 AM',
     datetime: '2026-08-30T11:00:00',
   },
+]
+
+const systemEvents = [
+  { daysAgo: 0, content: 'Alarm detected: Duct Static Pressure below threshold.' },
+  { daysAgo: 1, content: 'Communication restored for Supply Fan Speed.' },
+  { daysAgo: 5, content: 'Alarm cleared: CO2 returned to normal.' },
+  { daysAgo: 20, content: 'Override applied to Supply Fan Speed.' },
+]
+
+export const initialEquipmentNotes: EquipmentNote[] = [
+  ...systemEvents.map(({ daysAgo, content }, index): EquipmentNote => {
+    const createdAt = new Date()
+    createdAt.setHours(0, 0, 0, 0)
+    createdAt.setDate(createdAt.getDate() - daysAgo)
+    return {
+      ...createEquipmentNote(content),
+      id: `system-event-${index}`,
+      date: new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(createdAt),
+      time: new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' }).format(createdAt),
+      datetime: createdAt.toISOString(),
+      type: 'system-generated',
+    }
+  }),
+  ...historicalEquipmentNotes.map((note): EquipmentNote => ({ ...note, type: 'user-generated' })),
 ]
 
 export const equipmentDocuments: EquipmentDocument[] = [

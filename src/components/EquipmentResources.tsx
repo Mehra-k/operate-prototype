@@ -7,10 +7,11 @@ import {
   FileText,
   Expand,
   Trash2,
+  Upload,
   X,
 } from 'lucide-react'
 import {
-  equipmentDocuments,
+  createEquipmentNote,
   type EquipmentDocument,
   type EquipmentNote,
 } from '../data/equipmentResources.ts'
@@ -20,40 +21,23 @@ const equipmentImage = new URL('../assets/air-handling-unit.jpg', import.meta.ur
 export type EquipmentNotesProps = {
   notes: EquipmentNote[]
   onNotesChange: Dispatch<SetStateAction<EquipmentNote[]>>
+  onViewAllNotes: () => void
   notesOpen?: boolean
   onToggleNotes?: (open: boolean) => void
 }
 
-function NotesPanel({ notes, onNotesChange: setNotes, onToggleNotes }: EquipmentNotesProps) {
+function NotesPanel({ notes, onNotesChange: setNotes, onViewAllNotes, onToggleNotes }: EquipmentNotesProps) {
   const [draft, setDraft] = useState('')
+  const recentNotes = notes.slice().sort((first, second) =>
+    new Date(second.datetime).getTime() - new Date(first.datetime).getTime(),
+  ).slice(0, 5)
 
   function addNote(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const content = draft.trim()
     if (!content) return
 
-    const createdAt = new Date()
-    const date = new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    }).format(createdAt)
-    const time = new Intl.DateTimeFormat('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-    }).format(createdAt)
-
-    setNotes((current) => [
-      {
-        id: `note-${createdAt.getTime()}`,
-        content,
-        author: 'Jon Smith',
-        date,
-        time,
-        datetime: createdAt.toISOString(),
-      },
-      ...current,
-    ])
+    setNotes((current) => [createEquipmentNote(content), ...current])
     setDraft('')
   }
 
@@ -97,13 +81,16 @@ function NotesPanel({ notes, onNotesChange: setNotes, onToggleNotes }: Equipment
           </div>
       </form>
       <div className="notes-panel__list">
-        {notes.map((note) => (
+        {recentNotes.map((note) => (
           <NoteItem
             key={note.id}
             note={note}
             onDelete={deleteNote}
           />
         ))}
+        {notes.length > 5 && (
+          <button type="button" className="notes-panel__show-more" onClick={onViewAllNotes}>Show more</button>
+        )}
       </div>
     </section>
   )
@@ -153,14 +140,34 @@ function DocumentIcon({ type }: { type: EquipmentDocument['type'] }) {
 }
 
 export function DocumentsPanel({
+  documents,
+  onDocumentsChange,
   selectedDocumentId,
   onSelectDocument,
 }: {
+  documents: EquipmentDocument[]
+  onDocumentsChange: Dispatch<SetStateAction<EquipmentDocument[]>>
   selectedDocumentId: string | null
-  onSelectDocument: (documentId: string) => void
+  onSelectDocument: (documentId: string | null) => void
 }) {
   const [previewDocument, setPreviewDocument] = useState<EquipmentDocument | null>(null)
+  const [uploadError, setUploadError] = useState('')
   const previewDialog = useRef<HTMLDialogElement>(null)
+  const fileInput = useRef<HTMLInputElement>(null)
+
+  function addFile(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+    if (documents.some((document) => document.name.toLowerCase() === file.name.toLowerCase())) {
+      setUploadError('A file with this name already exists.')
+      return
+    }
+    setUploadError('')
+    const extension = file.name.includes('.') ? file.name.split('.').pop()?.toUpperCase() : undefined
+    const size = file.size < 1024 ? `${file.size} B` : file.size < 1024 * 1024 ? `${(file.size / 1024).toFixed(1)} KB` : `${(file.size / (1024 * 1024)).toFixed(1)} MB`
+    onDocumentsChange((current) => [...current, { id: crypto.randomUUID(), name: file.name, type: extension || file.type || 'File', size, file }])
+  }
 
   function openPreview(document: EquipmentDocument, event: React.MouseEvent) {
     event.stopPropagation()
@@ -175,6 +182,15 @@ export function DocumentsPanel({
 
   function handleDownload(document: EquipmentDocument, event: React.MouseEvent) {
     event.stopPropagation()
+    if (document.file) {
+      const url = URL.createObjectURL(document.file)
+      const link = window.document.createElement('a')
+      link.href = url
+      link.download = document.name
+      link.click()
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+      return
+    }
     // For prototype: show a browser download dialog for actual files if available
     // Otherwise just trigger the browser's download mechanism
     console.log(`Download triggered for: ${document.name}`)
@@ -185,11 +201,13 @@ export function DocumentsPanel({
     <>
       <section className="equipment-resource-panel documents-panel" aria-labelledby="documents-heading">
         <header className="equipment-resource-panel__header">
-          <h2 id="documents-heading">Associated Documents</h2>
-          <span>{equipmentDocuments.length}</span>
+          <div className="documents-panel__heading"><h2 id="documents-heading">Files</h2><span>{documents.length}</span></div>
+          <button type="button" className="equipment-resource-panel__header-action" onClick={() => fileInput.current?.click()}><Upload size={12} aria-hidden="true" /> Upload a file</button>
+          <input ref={fileInput} type="file" hidden onChange={addFile} aria-label="Select a file to upload" />
         </header>
+        {uploadError && <p role="alert">{uploadError}</p>}
         <div className="documents-panel__list">
-          {equipmentDocuments.map((document) => (
+          {documents.map((document) => (
             <div
               className={`documents-panel__row${selectedDocumentId === document.id ? ' is-selected' : ''}`}
               key={document.id}
@@ -226,6 +244,18 @@ export function DocumentsPanel({
                   onClick={(e) => handleDownload(document, e)}
                 >
                   <Download size={16} aria-hidden="true" />
+                </button>
+                <button
+                  className="documents-panel__action"
+                  type="button"
+                  title={`Delete ${document.name}`}
+                  aria-label={`Delete ${document.name}`}
+                  onClick={() => {
+                    onDocumentsChange((current) => current.filter((entry) => entry.id !== document.id))
+                    if (selectedDocumentId === document.id) onSelectDocument(null)
+                  }}
+                >
+                  <Trash2 size={16} aria-hidden="true" />
                 </button>
               </div>
             </div>
@@ -298,10 +328,10 @@ function FileIcon({ type, size }: { type: EquipmentDocument['type']; size: numbe
   return <FileText size={size} aria-hidden="true" />
 }
 
-export function EquipmentResources({ notes, onNotesChange, onToggleNotes }: EquipmentNotesProps) {
+export function EquipmentResources({ notes, onNotesChange, onViewAllNotes, onToggleNotes }: EquipmentNotesProps) {
   return (
     <div className="equipment-resources">
-      <NotesPanel notes={notes} onNotesChange={onNotesChange} onToggleNotes={onToggleNotes} />
+      <NotesPanel notes={notes} onNotesChange={onNotesChange} onViewAllNotes={onViewAllNotes} onToggleNotes={onToggleNotes} />
     </div>
   )
 }

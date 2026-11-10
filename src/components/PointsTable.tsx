@@ -1,17 +1,22 @@
 import { Search, Settings } from 'lucide-react'
 import { useState, useMemo } from 'react'
-import { operateOverviewData, type KeyPoint } from '../data/operateOverview.ts'
+import { getPointStatuses, operateOverviewData } from '../data/operateOverview.ts'
+import { PointStatusChips } from './PointStatusChips.tsx'
 
 type PointsTableProps = {
   onSelectPoint: (pointId: string) => void
 }
 
 const ITEMS_PER_PAGE_OPTIONS = [10, 25, 50]
+const columns = ['Point Name', 'Type', 'Current Value', 'Unit', 'Last Read', 'Status', 'Controlling Device', 'Device Point Name'] as const
+type PointColumn = (typeof columns)[number]
 
 export function PointsTable({ onSelectPoint }: PointsTableProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [itemsPerPage, setItemsPerPage] = useState(25)
   const [currentPage, setCurrentPage] = useState(1)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [visibleColumns, setVisibleColumns] = useState<PointColumn[]>(columns.slice(0, 6))
 
   const filteredPoints = useMemo(() => {
     if (!searchQuery.trim()) {
@@ -26,7 +31,9 @@ export function PointsTable({ onSelectPoint }: PointsTableProps) {
         (point.type && point.type.toLowerCase().includes(query)) ||
         point.value.toLowerCase().includes(query) ||
         point.unit.toLowerCase().includes(query) ||
-        point.state.toLowerCase().includes(query)
+        getPointStatuses(point).some((status) => status.toLowerCase().includes(query)) ||
+        (point.controllingDevice?.toLowerCase().includes(query) ?? false) ||
+        (point.devicePointName?.toLowerCase().includes(query) ?? false)
       )
     })
   }, [searchQuery])
@@ -46,29 +53,6 @@ export function PointsTable({ onSelectPoint }: PointsTableProps) {
     setCurrentPage(1)
   }
 
-  const getStatusColor = (state: KeyPoint['state']) => {
-    const stateMap: Record<KeyPoint['state'], string> = {
-      'Normal': 'is-normal',
-      'Low': 'is-alarm',
-      'High': 'is-alarm',
-      'Override': 'is-override',
-      'Down': 'is-down',
-      'Fault': 'is-fault',
-      'Out of Service': 'is-oos',
-    }
-    return stateMap[state] || ''
-  }
-
-  const getStatusLabel = (state: KeyPoint['state']) => {
-    if (state === 'Low' || state === 'High') {
-      return 'Alarm'
-    }
-    if (state === 'Out of Service') {
-      return 'Out of Service'
-    }
-    return state
-  }
-
   return (
     <section className="points-table-wrapper" aria-labelledby="points-tab-heading">
       <div className="points-table__search-container">
@@ -83,9 +67,27 @@ export function PointsTable({ onSelectPoint }: PointsTableProps) {
             aria-label="Search points"
           />
         </div>
-        <button className="points-table__filter" aria-label="Filter points" type="button">
-          <Settings size={18} aria-hidden="true" />
-        </button>
+        <div className="points-table__settings">
+          <button className="points-table__filter" aria-label="Column settings" aria-expanded={settingsOpen} type="button" onClick={() => setSettingsOpen((open) => !open)}>
+            <Settings size={18} aria-hidden="true" />
+          </button>
+          {settingsOpen && (
+            <div className="points-table__column-menu" role="group" aria-label="Columns">
+              <strong>Columns</strong>
+              {columns.map((column) => (
+                <label key={column}>
+                  <input
+                    type="checkbox"
+                    checked={visibleColumns.includes(column)}
+                    disabled={column === 'Point Name'}
+                    onChange={(event) => setVisibleColumns((current) => event.target.checked ? [...current, column] : current.filter((entry) => entry !== column))}
+                  />
+                  {column}
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {filteredPoints.length === 0 ? (
@@ -110,12 +112,7 @@ export function PointsTable({ onSelectPoint }: PointsTableProps) {
             <table className="points-table" role="table">
               <thead>
                 <tr>
-                  <th>Point Name</th>
-                  <th>Type</th>
-                  <th>Current Value</th>
-                  <th>Unit</th>
-                  <th>Last Read</th>
-                  <th>Status</th>
+                  {columns.filter((column) => visibleColumns.includes(column)).map((column) => <th key={column}>{column}</th>)}
                 </tr>
               </thead>
               <tbody>
@@ -130,23 +127,21 @@ export function PointsTable({ onSelectPoint }: PointsTableProps) {
                         {point.pointName}
                       </button>
                     </td>
-                    <td className="points-table__cell points-table__cell--type">
+                    {visibleColumns.includes('Type') && <td className="points-table__cell points-table__cell--type">
                       {point.type || '—'}
-                    </td>
-                    <td className="points-table__cell points-table__cell--value">
+                    </td>}
+                    {visibleColumns.includes('Current Value') && <td className="points-table__cell points-table__cell--value">
                       {point.value}
-                    </td>
-                    <td className="points-table__cell points-table__cell--unit">
+                    </td>}
+                    {visibleColumns.includes('Unit') && <td className="points-table__cell points-table__cell--unit">
                       {point.unit || '—'}
-                    </td>
-                    <td className="points-table__cell points-table__cell--updated">
+                    </td>}
+                    {visibleColumns.includes('Last Read') && <td className="points-table__cell points-table__cell--updated">
                       {point.updated}
-                    </td>
-                    <td className="points-table__cell points-table__cell--status">
-                      <span className={`points-table__status ${getStatusColor(point.state)}`}>
-                        {getStatusLabel(point.state)}
-                      </span>
-                    </td>
+                    </td>}
+                    {visibleColumns.includes('Status') && <td className="points-table__cell points-table__cell--status"><PointStatusChips point={point} /></td>}
+                    {visibleColumns.includes('Controlling Device') && <td className="points-table__cell">{point.controllingDevice || '-'}</td>}
+                    {visibleColumns.includes('Device Point Name') && <td className="points-table__cell">{point.devicePointName || '-'}</td>}
                   </tr>
                 ))}
               </tbody>

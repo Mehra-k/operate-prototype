@@ -31,6 +31,8 @@ export function formatPointValue(value: string | number, unit: string) {
   return unit === '%' ? `${value}%` : `${value} ${unit}`
 }
 
+export type PointStatus = 'Healthy' | 'In Alarm' | 'In Override' | 'Down' | 'Fault' | 'Out of Service'
+
 export type KeyPoint = {
   id: string
   pointName: string
@@ -38,9 +40,32 @@ export type KeyPoint = {
   unit: string
   type?: string
   state: 'Normal' | 'Low' | 'High' | 'Override' | 'Down' | 'Fault' | 'Out of Service'
+  statuses?: PointStatus[]
+  controllingDevice?: string
+  devicePointName?: string
   setpoint?: string
   updated: string
   trend: 'up' | 'down' | 'flat'
+}
+
+export function getPointStatuses(point: KeyPoint): PointStatus[] {
+  if (point.statuses) return point.statuses
+  if (point.state === 'Normal') return ['Healthy']
+  if (point.state === 'Low' || point.state === 'High') return ['In Alarm']
+  if (point.state === 'Override') return ['In Override']
+  return [point.state]
+}
+
+const devicePointNames: Record<string, string> = {
+  'zone-temp': 'ZN-T',
+  'supply-air-temp': 'SA-T',
+  'return-air-temp': 'RA-T',
+  'mixed-air-temp': 'MA-T',
+  'duct-static-pressure': 'DASP',
+  'supply-fan-speed': 'SF-CMD',
+  'co2': 'ZN-CO2',
+  'outdoor-air-damper': 'OAD-CMD',
+  'discharge-air-temp-oos': 'DA-T',
 }
 
 export const operateOverviewData = {
@@ -115,7 +140,7 @@ export const operateOverviewData = {
       trend: { label: 'Stable', change: '+0 changes', direction: 'flat' },
     },
   ],
-  keyPoints: [
+  keyPoints: ([
     {
       id: 'zone-temp',
       pointName: 'Zone Temp',
@@ -241,7 +266,13 @@ export const operateOverviewData = {
       updated: '12 hours ago',
       trend: 'flat',
     },
-  ] satisfies KeyPoint[],
+  ] satisfies KeyPoint[]).map((point): KeyPoint => ({
+    ...point,
+    statuses: point.id === 'duct-static-pressure' ? ['In Alarm', 'In Override']
+      : point.id === 'co2' ? ['In Alarm', 'Fault']
+        : getPointStatuses(point),
+    devicePointName: devicePointNames[point.id],
+  })),
 }
 
 export function getKeyPoint(pointId: string) {

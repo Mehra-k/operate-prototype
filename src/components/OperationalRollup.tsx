@@ -32,7 +32,6 @@ function RollupMetric({ status }: { status: RollupStatus }) {
       </span>
       <span className="operational-rollup__percentage">{percentage}%</span>
       <span className="operational-rollup__trend">
-        <span>Trend:</span>
         <TrendIcon size={12} aria-hidden="true" />
         <span>{status.trend.label} ({status.trend.change})</span>
       </span>

@@ -1,9 +1,11 @@
 import { ArrowLeft } from 'lucide-react'
 import {
   formatPointValue,
+  getPointStatuses,
   operateOverviewData,
   type KeyPoint,
 } from '../data/operateOverview.ts'
+import { PointStatusChips } from './PointStatusChips.tsx'
 
 type PointDetailsProps = {
   point: KeyPoint
@@ -24,9 +26,7 @@ export function PointDetails({ point, equipmentName, onBack }: PointDetailsProps
       </button>
       <header className="point-details__header">
         <h2>{point.pointName}</h2>
-        <span className={`point-details__state is-${point.state.toLowerCase()}`}>
-          {point.state}
-        </span>
+        <PointStatusChips point={point} />
       </header>
       <section className="point-details__summary" aria-label="Point status">
         <div>
@@ -37,7 +37,7 @@ export function PointDetails({ point, equipmentName, onBack }: PointDetailsProps
         </div>
         <div>
           <span>{alarm ? 'Alarm State' : 'Point State'}</span>
-          <strong className="point-details__status-text">{point.state}</strong>
+          <strong className="point-details__status-text">{alarm ? alarm.condition : getPointStatuses(point).join(', ')}</strong>
         </div>
         {alarm && (
           <div>

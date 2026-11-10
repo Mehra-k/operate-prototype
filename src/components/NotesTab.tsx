@@ -1,8 +1,9 @@
-import { useState, useMemo, type Dispatch, type FormEvent, type SetStateAction } from 'react'
-import { ChevronDown, Trash2, Plus } from 'lucide-react'
-import type { EquipmentNote } from '../data/equipmentResources.ts'
+import { useState, type Dispatch, type FormEvent, type SetStateAction } from 'react'
+import { ChevronDown, Search, Trash2 } from 'lucide-react'
+import { createEquipmentNote, type EquipmentNote } from '../data/equipmentResources.ts'
 
 type TimeFilter = 'all' | 'today' | 'last7' | 'last30' | 'custom'
+type NoteTypeFilter = 'all' | EquipmentNote['type']
 
 type NotesTabProps = {
   notes: EquipmentNote[]
@@ -12,141 +13,74 @@ type NotesTabProps = {
 export function NotesTab({ notes, onNotesChange: setNotes }: NotesTabProps) {
   const [searchText, setSearchText] = useState('')
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('all')
+  const [noteTypeFilter, setNoteTypeFilter] = useState<NoteTypeFilter>('all')
   const [customDateFrom, setCustomDateFrom] = useState('')
   const [customDateTo, setCustomDateTo] = useState('')
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest')
   const [filterOpen, setFilterOpen] = useState(false)
-  const [showAddNote, setShowAddNote] = useState(false)
   const [draft, setDraft] = useState('')
 
   const now = new Date()
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
 
-  function parseDateTime(dateStr: string, timeStr: string): Date {
-    const monthMap: { [key: string]: number } = {
-      'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
-      'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11,
+  const query = searchText.trim().toLowerCase()
+  const filteredNotes = notes.filter((note) => {
+    const matchesSearch = !query || [note.content, note.author, note.date, note.time, note.type.replace('-', ' ')]
+      .some((value) => value.toLowerCase().includes(query))
+    if (!matchesSearch || (noteTypeFilter !== 'all' && note.type !== noteTypeFilter)) return false
+
+    const noteDate = new Date(note.datetime)
+    if (timeFilter === 'today') return noteDate >= today && noteDate <= now
+    if (timeFilter === 'last7' || timeFilter === 'last30') {
+      const start = new Date(today)
+      start.setDate(start.getDate() - (timeFilter === 'last7' ? 7 : 30))
+      return noteDate >= start && noteDate <= now
     }
-    const [monthStr, dayStr, yearStr] = dateStr.split(' ')
-    const month = monthMap[monthStr]
-    const day = parseInt(dayStr.replace(',', ''), 10)
-    const year = parseInt(yearStr, 10)
-    
-    const [hourStr, minuteStr] = timeStr.split(':')
-    const hour = parseInt(hourStr, 10)
-    const minute = parseInt(minuteStr.replace(/[APM]/g, ''), 10)
-
-    return new Date(year, month, day, hour, minute)
-  }
-
-  const filteredNotes = useMemo(() => {
-    let result = notes.slice()
-
-    // Search filter
-    if (searchText.trim()) {
-      const query = searchText.toLowerCase()
-      result = result.filter((note) => {
-        const contentMatch = note.content.toLowerCase().includes(query)
-        const authorMatch = note.author.toLowerCase().includes(query)
-        const dateMatch = note.date.toLowerCase().includes(query)
-        return contentMatch || authorMatch || dateMatch
-      })
+    if (timeFilter === 'custom') {
+      const from = customDateFrom ? new Date(`${customDateFrom}T00:00:00`) : null
+      const to = customDateTo ? new Date(`${customDateTo}T23:59:59.999`) : null
+      return (!from || noteDate >= from) && (!to || noteDate <= to)
     }
-
-    // Time filter
-    if (timeFilter !== 'all') {
-      result = result.filter((note) => {
-        const noteDate = parseDateTime(note.date, note.time)
-        
-        if (timeFilter === 'today') {
-          const noteToday = new Date(noteDate.getFullYear(), noteDate.getMonth(), noteDate.getDate())
-          return noteToday.getTime() === today.getTime()
-        } else if (timeFilter === 'last7') {
-          const sevenDaysAgo = new Date(today)
-          sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
-          return noteDate >= sevenDaysAgo && noteDate <= now
-        } else if (timeFilter === 'last30') {
-          const thirtyDaysAgo = new Date(today)
-          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-          return noteDate >= thirtyDaysAgo && noteDate <= now
-        } else if (timeFilter === 'custom') {
-          if (!customDateFrom || !customDateTo) return true
-          const from = new Date(customDateFrom)
-          const to = new Date(customDateTo)
-          to.setHours(23, 59, 59, 999)
-          return noteDate >= from && noteDate <= to
-        }
-        return true
-      })
-    }
-
-    // Sort
-    result.sort((a, b) => {
-      const dateA = parseDateTime(a.date, a.time)
-      const dateB = parseDateTime(b.date, b.time)
-      return sortOrder === 'newest' ? dateB.getTime() - dateA.getTime() : dateA.getTime() - dateB.getTime()
-    })
-
-    return result
-  }, [notes, searchText, timeFilter, customDateFrom, customDateTo, sortOrder])
+    return true
+  }).sort((first, second) => {
+    const difference = new Date(first.datetime).getTime() - new Date(second.datetime).getTime()
+    return sortOrder === 'newest' ? -difference : difference
+  })
 
   function addNote(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const content = draft.trim()
     if (!content) return
 
-    const createdAt = new Date()
-    const date = new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    }).format(createdAt)
-    const time = new Intl.DateTimeFormat('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-    }).format(createdAt)
-
-    setNotes((current) => [
-      {
-        id: `note-${createdAt.getTime()}`,
-        content,
-        author: 'Jon Smith',
-        date,
-        time,
-        datetime: createdAt.toISOString(),
-      },
-      ...current,
-    ])
+    setNotes((current) => [createEquipmentNote(content), ...current])
     setDraft('')
-    setShowAddNote(false)
   }
 
   function deleteNote(noteId: string) {
     setNotes((current) => current.filter((note) => note.id !== noteId))
   }
 
-  const hasActiveFilters = searchText.trim() !== '' || timeFilter !== 'all'
+  const hasFilters = timeFilter !== 'all' || noteTypeFilter !== 'all'
+  const hasActiveFilters = Boolean(query) || hasFilters
   const isCustomRangeValid = !customDateFrom || !customDateTo || new Date(customDateFrom) <= new Date(customDateTo)
+
+  function clearFilters() {
+    setTimeFilter('all')
+    setNoteTypeFilter('all')
+    setCustomDateFrom('')
+    setCustomDateTo('')
+  }
 
   return (
     <div className="notes-tab">
       <header className="notes-tab__header">
         <div className="notes-tab__title-row">
           <h1 className="notes-tab__title">Notes</h1>
-          <button
-            className="notes-tab__add-btn"
-            onClick={() => setShowAddNote(!showAddNote)}
-            type="button"
-            title="Add a new note"
-          >
-            <Plus size={16} aria-hidden="true" />
-            Add Note
-          </button>
         </div>
 
-        {showAddNote && (
           <form className="notes-tab__add-form" onSubmit={addNote}>
             <textarea
+              aria-label="Note"
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
               placeholder="Enter a note"
@@ -158,7 +92,6 @@ export function NotesTab({ notes, onNotesChange: setNotes }: NotesTabProps) {
                 type="button"
                 onClick={() => {
                   setDraft('')
-                  setShowAddNote(false)
                 }}
               >
                 Cancel
@@ -168,16 +101,19 @@ export function NotesTab({ notes, onNotesChange: setNotes }: NotesTabProps) {
               </button>
             </div>
           </form>
-        )}
 
         <div className="notes-tab__controls">
-          <input
-            type="search"
-            className="notes-tab__search"
-            placeholder="Search notes"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-          />
+          <div className="notes-tab__search-wrapper">
+            <Search size={16} aria-hidden="true" />
+            <input
+              type="search"
+              className="notes-tab__search"
+              aria-label="Search notes"
+              placeholder="Search notes"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+            />
+          </div>
 
           <div className="notes-tab__filter-sort">
             <div className="notes-tab__filter-wrapper">
@@ -192,6 +128,19 @@ export function NotesTab({ notes, onNotesChange: setNotes }: NotesTabProps) {
               </button>
               {filterOpen && (
                 <div className="notes-tab__filter-menu">
+                  <div className="notes-tab__filter-section">
+                    <div className="notes-tab__filter-label">Note type</div>
+                    {([
+                      ['all', 'All Notes'],
+                      ['system-generated', 'System generated Notes'],
+                      ['user-generated', 'User generated Notes'],
+                    ] as const).map(([value, label]) => (
+                      <label key={value} className="notes-tab__filter-option">
+                        <input type="radio" name="note-type-filter" value={value} checked={noteTypeFilter === value} onChange={() => setNoteTypeFilter(value)} />
+                        <span>{label}</span>
+                      </label>
+                    ))}
+                  </div>
                   <div className="notes-tab__filter-section">
                     <div className="notes-tab__filter-label">Time</div>
                     {(['all', 'today', 'last7', 'last30', 'custom'] as const).map((option) => (
@@ -258,6 +207,7 @@ export function NotesTab({ notes, onNotesChange: setNotes }: NotesTabProps) {
             <div className="notes-tab__sort-wrapper">
               <select
                 className="notes-tab__control-select"
+                aria-label="Sort notes"
                 value={sortOrder}
                 onChange={(e) => setSortOrder(e.target.value as 'newest' | 'oldest')}
               >
@@ -305,18 +255,13 @@ export function NotesTab({ notes, onNotesChange: setNotes }: NotesTabProps) {
                 </button>
               </div>
             )}
-            <button
-              type="button"
-              onClick={() => {
-                setSearchText('')
-                setTimeFilter('all')
-                setCustomDateFrom('')
-                setCustomDateTo('')
-              }}
-              className="notes-tab__clear-all"
-            >
-              Clear all
-            </button>
+            {noteTypeFilter !== 'all' && (
+              <div className="notes-tab__filter-chip">
+                <span>{noteTypeFilter === 'system-generated' ? 'System generated Notes' : 'User generated Notes'}</span>
+                <button type="button" onClick={() => setNoteTypeFilter('all')} aria-label="Clear note type filter" className="notes-tab__chip-close">×</button>
+              </div>
+            )}
+            {hasFilters && <button type="button" onClick={clearFilters} className="notes-tab__clear-all">Clear filters</button>}
           </div>
         )}
 
@@ -329,35 +274,16 @@ export function NotesTab({ notes, onNotesChange: setNotes }: NotesTabProps) {
         {filteredNotes.length === 0 ? (
           <div className="notes-tab__empty-state">
             {notes.length === 0 ? (
+              <p>No notes yet.</p>
+            ) : query || hasFilters ? (
               <>
-                <p>No notes yet.</p>
-                <button
-                  type="button"
-                  onClick={() => setShowAddNote(true)}
-                  className="notes-tab__empty-add-btn"
-                >
-                  Add your first note
-                </button>
-              </>
-            ) : searchText.trim() || timeFilter !== 'all' ? (
-              <>
-                {searchText.trim() && !timeFilter.startsWith('last') && timeFilter !== 'today' ? (
+                {query ? (
                   <p>No notes match your search.</p>
                 ) : (
                   <p>No notes match the selected filters.</p>
                 )}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSearchText('')
-                    setTimeFilter('all')
-                    setCustomDateFrom('')
-                    setCustomDateTo('')
-                  }}
-                  className="notes-tab__empty-clear-btn"
-                >
-                  Clear filters
-                </button>
+                {query && <button type="button" onClick={() => setSearchText('')} className="notes-tab__empty-clear-btn">Clear search</button>}
+                {hasFilters && <button type="button" onClick={clearFilters} className="notes-tab__empty-clear-btn">Clear filters</button>}
               </>
             ) : null}
           </div>
@@ -399,6 +325,7 @@ function NoteItemTabVersion({
           <time dateTime={note.datetime} className="notes-tab__note-datetime">
             {note.date} · {note.time}
           </time>
+          <span className="notes-tab__note-datetime">{note.type === 'system-generated' ? 'System generated' : 'User generated'}</span>
         </div>
       </div>
       <div className="notes-tab__note-body">

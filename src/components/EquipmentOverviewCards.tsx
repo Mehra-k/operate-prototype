@@ -1,12 +1,13 @@
 import { useRef, useState, type ReactNode } from 'react'
 import {
   Building2,
-  Compass,
+  ChevronDown,
+  ChevronUp,
   Fan,
-  MapPin,
   Pencil,
   Settings2,
   Snowflake,
+  Trash2,
   Wind,
   X,
   type LucideIcon,
@@ -18,6 +19,13 @@ import {
 import { fieldInformation } from '../data/equipmentResources.ts'
 
 const equipmentImage = new URL('../assets/air-handling-unit.jpg', import.meta.url).href
+
+type FieldInformationEntry = {
+  id: string
+  title: string
+  value: string
+  custom: boolean
+}
 
 function OverviewCard({
   title,
@@ -39,13 +47,29 @@ function OverviewCard({
 }
 
 export function EquipmentPropertiesCard() {
-  const [information, setInformation] = useState(fieldInformation)
-  const [fieldDraft, setFieldDraft] = useState(fieldInformation)
+  const [information, setInformation] = useState<FieldInformationEntry[]>(() => [
+    { id: 'location', title: 'Location', value: fieldInformation.location, custom: false },
+    { id: 'access', title: 'Access', value: fieldInformation.access, custom: false },
+    { id: 'orientation', title: 'Orientation', value: fieldInformation.orientation, custom: false },
+  ])
+  const [fieldDraft, setFieldDraft] = useState<FieldInformationEntry[]>([])
+  const [fieldInformationOpen, setFieldInformationOpen] = useState(true)
   const editDialog = useRef<HTMLDialogElement>(null)
+  const nextFieldId = useRef(0)
+
+  function cancelFieldInformation() {
+    setFieldDraft(information.map((field) => ({ ...field })))
+    editDialog.current?.close()
+  }
+
+  function updateField(id: string, changes: Partial<Pick<FieldInformationEntry, 'title' | 'value'>>) {
+    setFieldDraft((current) => current.map((field) => field.id === id ? { ...field, ...changes } : field))
+  }
 
   function saveFieldInformation(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setInformation({ location: fieldDraft.location.trim(), access: fieldDraft.access.trim(), orientation: fieldDraft.orientation.trim() })
+    if (fieldDraft.some((field) => !field.title.trim())) return
+    setInformation(fieldDraft.map((field) => ({ ...field, title: field.title.trim() })))
     editDialog.current?.close()
   }
 
@@ -69,16 +93,23 @@ export function EquipmentPropertiesCard() {
           </div>
           <div className="combined-info-card__field-info">
             <div className="combined-info-card__field-heading">
-              <h3 className="combined-info-card__subheading">Field Information</h3>
-              <button className="equipment-resource-panel__header-action" type="button" onClick={() => {
-                setFieldDraft(information)
-                editDialog.current?.showModal()
-              }}>
-                <Pencil size={12} aria-hidden="true" />
-                Edit
-              </button>
+              <h3 className="combined-info-card__subheading" id="field-information-heading">
+                <button className="combined-info-card__field-toggle" type="button" aria-expanded={fieldInformationOpen} aria-controls="field-information-content" onClick={() => setFieldInformationOpen((open) => !open)}>
+                  Field Information
+                  {fieldInformationOpen ? <ChevronUp size={12} aria-hidden="true" /> : <ChevronDown size={12} aria-hidden="true" />}
+                </button>
+              </h3>
+              {fieldInformationOpen && (
+                <button className="equipment-resource-panel__header-action" type="button" onClick={() => {
+                  setFieldDraft(information.map((field) => ({ ...field })))
+                  editDialog.current?.showModal()
+                }}>
+                  <Pencil size={12} aria-hidden="true" />
+                  Edit
+                </button>
+              )}
             </div>
-            <div className="field-information-panel__body">
+            <div className="field-information-panel__body" id="field-information-content" hidden={!fieldInformationOpen}>
               <img
                 className="field-information-panel__photo"
                 src={equipmentImage}
@@ -88,38 +119,41 @@ export function EquipmentPropertiesCard() {
                 height={240}
               />
               <dl className="field-information-panel__list">
-                <div>
-                  <MapPin size={13} aria-hidden="true" />
-                  <dt>Location</dt>
-                  <dd>{information.location}</dd>
-                </div>
-                <div>
-                  <MapPin size={13} aria-hidden="true" />
-                  <dt>Access</dt>
-                  <dd>{information.access}</dd>
-                </div>
-                <div>
-                  <Compass size={13} aria-hidden="true" />
-                  <dt>Orientation</dt>
-                  <dd>{information.orientation}</dd>
-                </div>
+                {information.map((field) => (
+                  <div key={field.id}>
+                    <dt>{field.title}</dt>
+                    <dd>{field.value}</dd>
+                  </div>
+                ))}
               </dl>
             </div>
           </div>
         </div>
       </OverviewCard>
-      <dialog className="equipment-state-customize field-information-panel__edit" ref={editDialog} aria-labelledby="edit-field-information-heading">
+      <dialog className="equipment-state-customize field-information-panel__edit" ref={editDialog} aria-labelledby="edit-field-information-heading" onCancel={() => setFieldDraft(information.map((field) => ({ ...field })))}>
         <header>
           <h3 id="edit-field-information-heading">Edit Field Information</h3>
-          <button type="button" title="Close" aria-label="Close field information editor" onClick={() => editDialog.current?.close()}><X size={16} aria-hidden="true" /></button>
+          <button type="button" title="Close" aria-label="Close field information editor" onClick={cancelFieldInformation}><X size={16} aria-hidden="true" /></button>
         </header>
         <form onSubmit={saveFieldInformation}>
-          <label>Location<input value={fieldDraft.location} onChange={(event) => setFieldDraft((current) => ({ ...current, location: event.target.value }))} required /></label>
-          <label>Access<input value={fieldDraft.access} onChange={(event) => setFieldDraft((current) => ({ ...current, access: event.target.value }))} required /></label>
-          <label>Orientation<textarea value={fieldDraft.orientation} onChange={(event) => setFieldDraft((current) => ({ ...current, orientation: event.target.value }))} required /></label>
+          <div className="field-information-panel__edit-fields">
+            {fieldDraft.map((field) => (
+              <div className="field-information-panel__edit-field" key={field.id}>
+                <label>Field title<input value={field.title} onChange={(event) => updateField(field.id, { title: event.target.value })} required /></label>
+                <label>Field value{field.id === 'orientation'
+                  ? <textarea value={field.value} onChange={(event) => updateField(field.id, { value: event.target.value })} />
+                  : <input value={field.value} onChange={(event) => updateField(field.id, { value: event.target.value })} />}</label>
+                {field.custom && <button className="equipment-state-card__customize" type="button" aria-label={`Delete ${field.title || 'custom field'}`} title="Delete field" onClick={() => setFieldDraft((current) => current.filter((entry) => entry.id !== field.id))}><Trash2 size={12} aria-hidden="true" /> Delete</button>}
+              </div>
+            ))}
+            <button type="button" className="equipment-state-card__customize" onClick={() => {
+              nextFieldId.current += 1
+              setFieldDraft((current) => [...current, { id: `custom-${nextFieldId.current}`, title: '', value: '', custom: true }])
+            }}>+ Add field</button>
+          </div>
           <footer>
-            <button type="button" className="equipment-state-card__customize" onClick={() => editDialog.current?.close()}>Cancel</button>
-            <button type="submit" className="equipment-state-card__customize" disabled={!fieldDraft.location.trim() || !fieldDraft.access.trim() || !fieldDraft.orientation.trim()}>Save</button>
+            <button type="button" className="equipment-state-card__customize" onClick={cancelFieldInformation}>Cancel</button>
+            <button type="submit" className="equipment-state-card__customize" disabled={fieldDraft.some((field) => !field.title.trim())}>Save</button>
           </footer>
         </form>
       </dialog>
