@@ -1,5 +1,25 @@
 # Current Operate Prototype State
 
+## Current Implementation Snapshot (November 10, 2026)
+
+This snapshot reflects the current repository implementation and supersedes conflicting descriptions in the historical checkpoint notes below. The prototype uses local mock data; it has no backend, real alarm operations, authentication, or persistence across reloads.
+
+- **Navigation:** The equipment tabs are Operate, Equipment Graphic, Points, Associated Documents, and Notes. The Equipment Graphic is a static schematic. Point Trend is in Operate; there is no Trends tab in the current equipment navigation.
+- **Active Alarms and Faults:** On Operate, the summary above the tabs is expanded initially and can be collapsed or expanded using its header or chevron. It shows two mock alarms and a View all alarms action that opens the alarm-filtered Points view. The table contains Point, Alarm Message, Acknowledge, Clear, Current Value, Time in Alarm, and Action. Low and High conditions show direction arrows; View Point opens the selected point. Acknowledge and Clear toggle local feedback only; neither changes the mock alarms or counts.
+- **Equipment Properties and Field Information:** A combined card displays read-only equipment properties and a representative AHU photo. Field Information has free-form Location, Access, and Orientation fields; Edit opens a local form, Save requires nonblank values, and Cancel discards the draft. Changes are local to the mounted card and can reset on remount or reload.
+- **Equipment State:** Displays Control Mode, Occupancy, Operating Mode, Fan Status, and Outdoor Air Damper. Customize toggles visible fields locally; it does not change equipment operation or enforce permissions.
+- **Controlling Devices:** Two mock devices, EYC-303 and EYC-304, show type, Program/Sequence, and Connected status. The first has `AHU Standard v2.3`; the second shows `-`. Device selection leads to the Command Center stub, not a device-detail screen.
+- **Operational Roll-up:** Six mock statuses are shown, with counts out of 14 and 24-hour trend labels: Healthy 7 (Stable, +0 delta), In Alarm 2 (Escalating, +1 alarms), In Override 1 (Flat, 0 changed), Down 1 (Stable, +0 changes), Fault 1 (Stable, +0 changes), and Out of Service 2 (Stable, +0 changes). Only In Alarm and In Override open filtered Points views. Counts and trends are fixed examples, not live analytics.
+- **Roll-up details:** Mouse hover shows a Healthy summary or matching point details for In Alarm, In Override, Down, Fault, and Out of Service when matching mock Key Points exist. Down includes last communication time; Fault includes a sensor-fault summary. The component does not open these popovers on keyboard focus, and the four non-filter cards are not keyboard buttons.
+- **EF status colours:** Healthy/Normal use OK green `#358600`; In Alarm and Out of Service use red `#BE2434`; Override uses purple `#9781E2`; Down and Fault use orange `#C0570D`. The full primary/secondary palette remains defined in `src/data/statusColors.ts` and listed below.
+- **Key Points:** All 12 mock points are selected initially. Cards show name, value/unit, state, last update, and a navigation chevron; selecting a card opens that exact Point Details. State vocabulary is Normal, Low, High, Override, Down, Fault, and Out of Service: Low/High represent alarm direction, while the other names correspond to the roll-up categories. These are not identical display labels to Healthy, In Alarm, and In Override.
+- **Key Points Customise:** The dialog lists all 12 points with value and state. Checkbox edits are drafts until Apply; Cancel, close, and Escape discard the draft. The implementation permits an empty selection. Selection is local component state and can reset when the view is remounted or reloaded. The Points tab provides the full mock point table; there is no View all points control in the Key Points component.
+- **Other workflows:** Points provides search and pagination, but no sorting; Point Details retains selected-point context. Operate includes an inline expandable Point Trend and Related Equipment navigation. Notes are shared between the Operate panel and Notes tab during the app session; Associated Documents and their preview/download behavior are mocked. Related equipment changes navigation context, but overview and alarm data remain based on the AHU-SA-01 mock dataset.
+
+## Historical Checkpoint Notes
+
+The following dated notes preserve earlier requirements and session history. They may describe superseded tab orders, counts, controls, data, or behavior; use the current snapshot above and the source code for the present state.
+
 Checkpoint date: November 5, 2026 at 15:20 UTC. Read this first when continuing in a new Agent chat, then inspect the referenced code and [requirements](operate-requirements.md). The repository, not past conversation history, is the source of truth.
 
 ## Latest Updates (November 5, 2026)

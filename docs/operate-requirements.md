@@ -1,5 +1,17 @@
 # Operate Requirements
 
+## Current Implementation (November 10, 2026)
+
+The current repository snapshot is documented in [Current Prototype State](current-prototype-state.md#current-implementation-snapshot-november-10-2026). It supersedes conflicting implemented-feature descriptions in the historical requirements and checkpoint notes below; those notes remain as design and session history, not claims that every proposed behavior is present.
+
+- Active Alarms and Faults appears on Operate, initially expanded and collapsible. Its seven-column table offers local Acknowledge/Clear feedback and exact-point navigation; View all alarms opens the alarm-filtered Points view. No live alarm is acknowledged or cleared.
+- Equipment Properties and free-form Field Information share a card. Field Information edits are local. Equipment State field visibility can be customized locally. Controlling Devices show Connected and Program/Sequence; device navigation ends at a stub.
+- Operational Roll-up shows Healthy 7/14, In Alarm 2/14, In Override 1/14, Down 1/14, Fault 1/14, and Out of Service 2/14, with fixed 24-hour trend examples and the established EF status colours. Alarm and override cards open filtered Points views. Hover provides details for all six categories when matching mock points exist; keyboard focus does not open the popovers.
+- Key Points initially displays all 12 mock points. Customise uses draft checkbox selection with Apply and Cancel; an empty selection is allowed. Card statuses use Normal, Low, High, Override, Down, Fault, and Out of Service, corresponding to the roll-up vocabulary while retaining Low/High alarm direction. Point selection opens the exact Point Details. Changes are local and can reset on remount or reload.
+- Current equipment tabs are Operate, Equipment Graphic, Points, Associated Documents, and Notes. The graphic is static; Point Trend remains in Operate. The prototype uses mock data and has no backend, live alarm actions, authentication, or reload persistence.
+
+## Historical Requirements and Checkpoints
+
 Source: [Operate_Figjam modification, node 618:3013](https://www.figma.com/board/JCDjrqRMvGF9Pzktfi4Ehz/Mehra-s-sand-box?node-id=618-3013).
 
 This document records the current mockup as reference and the annotations as the target direction. It does not specify or implement screens beyond what the board shows.
